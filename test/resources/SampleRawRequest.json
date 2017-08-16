@@ -1,0 +1,78 @@
+{
+  "notification": {
+    "client": "SL",
+    "priority": "10",
+    "badge_count": "increase",
+    "content": {
+      "en-us": {
+        "title": "this is a test message.",
+        "subtitle": "this is a test with var firstname {*firstname*}",
+        "message": "this is a test with var lastname {*lastname*}, firstname,{*firstname*}",
+        "action": "",
+        "display": true,
+        "button_text": "",
+        "button_url": "",
+        "image_url": ""
+      },
+      "fa-ir": {
+        "title": "",
+        "subtitle": "",
+        "message": "",
+        "action": "",
+        "display": true,
+        "button_text": "",
+        "button_url": "",
+        "image_url": ""
+      }
+    },
+    "target-time": {
+      "start_date": "",
+      "end_date": "",
+      "frequency": "",
+      "limit_per_user": ""
+    },
+    "target-user": {
+      "push_token": {
+        "eql":"something"
+      },
+      "email_address": "",
+      "mobile_number": "",
+      "firstname": "",
+      "lastname": "",
+      "gender": "",
+      "date_of_birth": "",
+      "passport_expiry": "",
+      "language": "",
+      "currency": "",
+      "city": "",
+      "country": "",
+      "is_member": true,
+      "flight_stats_notification": true,
+      "campaign_notification": true,
+      "app_version": "",
+      "device_type": "",
+      "device_os_version": "",
+      "device_locale": ""
+    },
+    "target-bookings": {
+      "pnr": "",
+      "flight_number": "",
+      "origin_airport": "",
+      "destination_airport": "",
+      "std": "",
+      "sta": "",
+      "passenger_count": "",
+      "has_children": "",
+      "has_infant": "",
+      "payment_status": "",
+      "payment_hold_datetime": "",
+      "checkin_status": ""
+    },
+    "target-location": {
+      "geofence": "",
+      "latitude": "",
+      "longitude": "",
+      "radius": ""
+    }
+  }
+}

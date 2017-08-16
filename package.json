@@ -1,0 +1,25 @@
+{
+  "name": "jerome-compiler",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "nyc --reporter=text mocha",
+    "gen-docs": "rm -rf docs && node_modules/jsdoc/jsdoc.js -r -c jsdoc.json src/** -d docs&&node_modules/opn-cli/cli.js docs/index.html",
+    "open-docs": "node_modules/opn-cli/cli.js docs/index.html "
+  },
+  "author": "A.Aghabeiki",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "docdash": "^0.4.0",
+    "documentation": "^5.2.1",
+    "jsdoc": "^3.5.4",
+    "mocha": "^3.5.0",
+    "nyc": "^11.1.0",
+    "opn-cli": "^3.1.0",
+    "should": "^11.2.1"
+  },
+  "dependencies": {
+    "lcid": "^1.0.0"
+  }
+}
