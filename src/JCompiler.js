@@ -57,10 +57,16 @@ class JCompiler {
      *       data for next steps</p>
      * @returns {waterlineQueryFunction}
      */
-    waterlineQueryFunctionBuilder() {
+    waterlineQueryFunctionBuilder(prefix) {
 
-        let target=this.target;
-        target
+        if (prefix == undefined)
+            prefix = '';
+        let target = this.target;
+
+        Object.keys(target).forEach(key=>{
+            let tmp=target[key];
+
+        })
 
         let functionBody = '';
 

@@ -14,10 +14,14 @@
     "docdash": "^0.4.0",
     "documentation": "^5.2.1",
     "jsdoc": "^3.5.4",
+    "lodash": "^4.17.4",
     "mocha": "^3.5.0",
     "nyc": "^11.1.0",
     "opn-cli": "^3.1.0",
-    "should": "^11.2.1"
+    "sails-memory": "^0.10.7",
+    "sails-mysql": "^0.11.5",
+    "should": "^11.2.1",
+    "waterline": "^0.11.11"
   },
   "dependencies": {
     "lcid": "^1.0.0"

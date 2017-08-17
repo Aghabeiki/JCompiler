@@ -83,8 +83,8 @@ class Parser {
                         targets[key] = tmpVerbKeys.map(verbKey => {
                             return {
                                 keyName: verbKey,
-                                keyTarget: rawTarget[key][verbKey],
-                                value: commons.commons.getVerbConfig(verbKey)
+                                keyTarget: commons.commons.getVerbConfig(verbKey),
+                                value: rawTarget[key][verbKey]
                             };
                         }).reduce((p, v) => {
                             p[v.keyName] = v;

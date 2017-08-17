@@ -1,0 +1,20 @@
+module.exports = {
+    push_token: 'test',
+    email_address: 'amin.aghabeiki@gmail.com',
+    mobile_number: 127623452,
+    firstname: 'amin',
+    lastname: 'aghabeiki',
+    gender: 1,
+    date_of_birth: '1987/03/21',
+    passport_expiry: '2020/03/04',
+    language: 'EN',
+    currency: 'RM',
+    city: 'kuala lumpur',
+    country: 'MY',
+    is_member: true,
+    flight_stats_notification: true,
+    app_version: '0',
+    device_type: 'android',
+    device_os_version: '0',
+    device_locale: 'en-us'
+}
