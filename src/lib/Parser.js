@@ -70,7 +70,7 @@ class Parser {
             const topKey = Object.keys(rawTarget);
 
             if (topKey.filter(commons.validator.topKeyValidator).length !== topKey.length) {
-                throw new Error('target(s) is(are) missed or not valid')
+                throw new Error('target(s) is(are) missed or not valid ' + JSON.stringify(topKey))
             }
             else {
                 let targets = {};
@@ -99,16 +99,22 @@ class Parser {
         }
     }
 
+    loadDeviceConditons(devicesRuls) {
+        let outjson = {};
+        let myDeviceRules = Object.keys(devicesRuls).map(key => {
+            return {
+                value: devicesRuls[key].value,
+                config: devicesRuls[key].keyTarget
+            }
+        }).filter(rules => {
+            return rules.config.inDevices
+        }).forEach(rules => {
+            // todo first check the rules is belong to the key
+            // todo then check the rules type config ( in operands files under libs folder )
+            // todo generate the where jeson file like my output '{push_token: "test"};'
 
-    createCondition(target) {
-        return {
-            where: Object.keys(target).reduce((p, key) => {
-                let tmp = target[key];
-                p[key]=tmp.value
-                return p;
-            }, {})
-        };
-
+        })
+        return outjson;
     }
 }
 

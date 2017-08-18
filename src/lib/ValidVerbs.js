@@ -40,9 +40,7 @@
  */
 
 const verbList = {
-    "push_token": {
-        "type": "string"
-    },
+    "push_token": "",
     "email_address": "",
     "mobile_number": "",
     "firstname": "",
@@ -58,13 +56,21 @@ const verbList = {
     "flight_stats_notification": "",
     "campaign_notification": "",
     "app_version": "",
-    "device_type": "",
+    "device_type": {
+        inDevices: true,
+        maps: ['devices.device_type'],
+        acceptableOperand: ['eql', 'inList', 'exList']
+    },
     "device_os_version": "",
     "device_locale": "",
     "pnr": "",
     "flight_number": "",
     "origin_airport": "",
-    "destination_airport": "",
+    "destination_airport": {
+        inDevices: false,
+        maps: ['flights.destination'],
+        acceptableOperand: ['eql', 'inList', 'exList']
+    },
     "std": "",
     "sta": "",
     "passenger_count": "",

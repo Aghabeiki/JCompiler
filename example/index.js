@@ -6,8 +6,10 @@ const JCompiler = require('../index');
 // all android devices that travel to bangkok ,
 
 let jCompiler = new JCompiler({
-    user: {
-        push_token: 'test'
+    device: {
+        device_type: {
+            eql: 'android'
+        }
     }
 }, {
     "en-us": {
@@ -22,22 +24,24 @@ let jCompiler = new JCompiler({
     }
 });
 dataModel((err, models) => {
-    if (err) {
-        throw new Error('waterline not loaded');
-    }
-    else {
-        jCompiler.waterlineQueryFunctionBuilder().call(this, models, (err, rawPNSList) => {
-            "use strict";
-            if (err) {
-                console.log(err);
-            }
-            else {
-                console.dir(rawPNSList);
-                process.exit(1);
-            }
-        })
+        if (err) {
+            throw new Error('waterline not loaded');
+        }
+        else {
 
+            jCompiler.waterlineQueryFunctionBuilder('.collections').call(this, models, (err, rawPNSList) => {
+                "use strict";
+                if (err) {
+                    console.log(err);
+                }
+                else {
+                    console.dir(rawPNSList);
+                    process.exit(1);
+                }
+            })
+
+        }
     }
-})
+)
 
 

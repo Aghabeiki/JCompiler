@@ -62,22 +62,29 @@ class JCompiler {
         if (prefix == undefined)
             prefix = '';
         let target = this.target;
+        let defineDevices = ' let devices=sails' + prefix + '.devices;\n\r';
+        let defineBookings = ' let bookings=sails' + prefix + '.bookings\n\r';
+        let defineFlights = ' let flights=sails' + prefix + '.flights\n\r';
+        let defineFerris = ' let ferris=sails' + prefix + '.ferris\n\r';
+        let defineCoaches = ' let coaches=sails' + prefix + '.coaches\n\r';
+        // todo remember if it's on sails not need to populate like this
+        let deviceConditions = 'devices.find({where:conditions}).populate([\'anyFlights\']).exec(cb)\n\r';
+        let functionBody = '';
 
-        let devicesCondition = {}
-        Object.keys(target).forEach(key => {
-            if (key.toLowerCase() == 'user') {
-                devicesCondition = parser.createCondition(target[key]);
-            }
+        // check the target for device conditions
+        if (Object.keys(target).indexOf('device') != -1) {
+            // add the device data models to function body
+            functionBody += defineDevices;
+            let rules = parser.loadDeviceConditons(target['device']);
+            functionBody += deviceConditions.replace('conditions', JSON.stringify(rules));
+        }
+        else {
+            // so fetch every things from devices
+            functionBody = 'cb(null)';
+        }
 
-        })
 
-        let functionBody =  "sails.collections.devices.find({where: {'push_token': 'test'}}).exec(cb)";
-
-
-
-
-
-        return new Function('sails','cb', functionBody);
+        return new Function('sails', 'cb', functionBody);
     }
 
 }

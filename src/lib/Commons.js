@@ -2,6 +2,7 @@ let verbs = require('./ValidVerbs');
 
 
 let Handler = null;
+
 /**
  * @classdesc Commons Library singleton.<br>
  *              <p>
@@ -111,8 +112,9 @@ class Commons {
         "use strict";
         let output = false;
         switch (key.toLowerCase()) {
-            case 'user':
-            case 'bookings':
+            case 'device':
+            case 'booking':
+            case 'flight' :
             case 'location':
                 output = true;
                 break;
