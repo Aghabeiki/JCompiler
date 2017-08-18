@@ -9,9 +9,10 @@ const loadDataModels = (defaultConnection) => {
     return require('fs').readdirSync('./models').filter(filename => {
         return filename.endsWith('.js')
     }).map(filename => {
-        let tmp=require(path.resolve('./models', filename));;
-        tmp.identity=tmp.tableName;
-        tmp.connection=defaultConnection
+        let tmp = require(path.resolve('./models', filename));
+        ;
+        tmp.identity = tmp.tableName;
+        tmp.connection = defaultConnection
         return tmp
     })
 }
@@ -43,7 +44,12 @@ module.exports = function (cb) {
     "use strict";
     const defaultConnection = 'myLocalMySql';
 
-    loadDataModels(defaultConnection).map(Waterline.Collection.extend).forEach(orm.loadCollection);
+    loadDataModels(defaultConnection).map((data) => {
+        return Waterline.Collection.extend(data);
+    }).forEach((data) => {
+        return orm.loadCollection(data);
+    });
+
 
 // Start Waterline passing adapters in
     orm.initialize(config, function (err, models) {
