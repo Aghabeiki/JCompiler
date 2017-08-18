@@ -159,6 +159,30 @@ module.exports = {
             required: false,
             size: 255,
             index: true
+        },
+        anyFlights: {
+            collection: 'flights',
+            via: 'ownerDevice',
+            dominant: true,
+            through:'devices_flights'
+        },
+        anyFerris: {
+            collection: 'ferris',
+            via: 'ownerDevice',
+            dominant: true,
+            through:'devices_ferris'
+        },
+        anyCoaches: {
+            collection: 'coaches',
+            via: 'ownerDevice',
+            dominant: true,
+            through:'devices_coaches'
+        },
+        anyBooking: {
+            collection: 'bookings',
+            via: 'ownerDevice',
+            dominant: true,
+            through:'devices_bookings'
         }
     }
 };

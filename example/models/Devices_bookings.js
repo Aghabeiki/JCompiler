@@ -6,25 +6,24 @@
  */
 
 module.exports = {
-  tableName: 'devices_bookings',
-  autoPK:false,
-  attributes: {
-    id: {
-      type: 'integer',
-      //required: true,
-      autoIncrement: true,
-      primaryKey: true,
-      size: 11
-    },
-    device_id: {
-      type: 'integer',
-      required: true,
-      size: 11
-    },
-    booking_id: {
-      type: 'integer',
-      required: true,
-      size: 11
+    tableName: 'devices_bookings',
+    tables: ['devices', 'bookings'],
+    junctionTable: true,
+    attributes: {
+        id: {
+            type: 'integer',
+            // required: true,
+            autoIncrement: true,
+            primaryKey: true,
+            size: 11
+        },
+        device_id: {
+            columnName: 'device_id',
+            model: 'devices'
+        },
+        booking_id: {
+            columnName: 'booking_id',
+            model: 'bookings'
+        }
     }
-  }
 };

@@ -1,11 +1,13 @@
 const dataModel = require('./dataModelsLoader');
 const JCompiler = require('../index');
 
+// example for device join with bookings
+// all android devices that travel to bangkok
+// all android devices that travel to bangkok ,
+
 let jCompiler = new JCompiler({
     user: {
-        push_token: {
-            eql: 'something'
-        }
+        push_token: 'test'
     }
 }, {
     "en-us": {
@@ -19,5 +21,23 @@ let jCompiler = new JCompiler({
         "image_url": ""
     }
 });
-jCompiler.waterlineQueryFunctionBuilder()
+dataModel((err, models) => {
+    if (err) {
+        throw new Error('waterline not loaded');
+    }
+    else {
+        jCompiler.waterlineQueryFunctionBuilder().call(this, models, (err, rawPNSList) => {
+            "use strict";
+            if (err) {
+                console.log(err);
+            }
+            else {
+                console.dir(rawPNSList);
+                process.exit(1);
+            }
+        })
+
+    }
+})
+
 

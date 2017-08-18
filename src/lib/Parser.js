@@ -99,8 +99,16 @@ class Parser {
         }
     }
 
-    ParseOperand(verb, operand) {
-        
+
+    createCondition(target) {
+        return {
+            where: Object.keys(target).reduce((p, key) => {
+                let tmp = target[key];
+                p[key]=tmp.value
+                return p;
+            }, {})
+        };
+
     }
 }
 

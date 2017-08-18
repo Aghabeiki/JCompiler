@@ -63,18 +63,21 @@ class JCompiler {
             prefix = '';
         let target = this.target;
 
-        Object.keys(target).forEach(key=>{
-            let tmp=target[key];
+        let devicesCondition = {}
+        Object.keys(target).forEach(key => {
+            if (key.toLowerCase() == 'user') {
+                devicesCondition = parser.createCondition(target[key]);
+            }
 
         })
 
-        let functionBody = '';
+        let functionBody =  "sails.collections.devices.find({where: {'push_token': 'test'}}).exec(cb)";
 
 
-        functionBody += ' cb(null);';
 
 
-        return new Function('cb', functionBody);
+
+        return new Function('sails','cb', functionBody);
     }
 
 }

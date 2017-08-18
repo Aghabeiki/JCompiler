@@ -103,6 +103,11 @@ module.exports = {
             type: 'string',
             required: false,
             size: 225
+        },
+        ownerDevice:{
+            collection: 'devices',
+            via: 'anyFlights',
+            through: 'devices_flights'
         }
     }
 };

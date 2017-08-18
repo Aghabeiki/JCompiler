@@ -6,25 +6,24 @@
  */
 
 module.exports = {
-  tableName: 'devices_coaches',
-  autoPK:false,
-  attributes: {
-    id: {
-      type: 'integer',
-     // required: true,
-      autoIncrement: true,
-      primaryKey: true,
-      size: 11
-    },
-    device_id: {
-      type: 'integer',
-      required: true,
-      size: 11
-    },
-    coach_id: {
-      type: 'integer',
-      required: true,
-      size: 11
+    tableName: 'devices_coaches',
+    tables: ['devices', 'coaches'],
+    junctionTable: true,
+    attributes: {
+        id: {
+            type: 'integer',
+            // required: true,
+            autoIncrement: true,
+            primaryKey: true,
+            size: 11
+        },
+        device_id: {
+            columnName: 'device_id',
+            model: 'devices'
+        },
+        ferry_id: {
+            columnName: 'ferry_id',
+            model: 'coaches'
+        }
     }
-  }
 };

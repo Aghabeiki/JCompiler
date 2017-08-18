@@ -103,6 +103,11 @@ module.exports = {
             type: 'string',
             required: false,
             size: 225
+        },
+        ownerDevice:{
+            collection: 'devices',
+            via: 'anyCoaches',
+            through: 'devices_coaches'
         }
     }
 };

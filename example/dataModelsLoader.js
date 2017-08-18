@@ -1,7 +1,20 @@
 const Waterline = require('waterline');
 const orm = new Waterline();
 const MemoryAdaptor = require('sails-memory');
-const MySQLAdaptor = require('sails-mysql')
+const MySQLAdaptor = require('sails-mysql');
+const path = require('path');
+const loadDataModels = (defaultConnection) => {
+    "use strict";
+
+    return require('fs').readdirSync('./models').filter(filename => {
+        return filename.endsWith('.js')
+    }).map(filename => {
+        let tmp=require(path.resolve('./models', filename));;
+        tmp.identity=tmp.tableName;
+        tmp.connection=defaultConnection
+        return tmp
+    })
+}
 
 const config = {
     adapters: {
@@ -30,32 +43,16 @@ module.exports = function (cb) {
     "use strict";
     const defaultConnection = 'myLocalMySql';
 
-    const devices = require('./models/Devices');
-    devices.identity = 'devices';
-    devices.connection = defaultConnection
-    let Devices = Waterline.Collection.extend(devices);
-
-    const bookings = require('./models/Bookings');
-    bookings.identity = 'bookings';
-    bookings.connection = defaultConnection
-    var Bookings = Waterline.Collection.extend(bookings);
-
-    orm.loadCollection(Devices);
-    orm.loadCollection(Bookings);
-
+    loadDataModels(defaultConnection).map(Waterline.Collection.extend).forEach(orm.loadCollection);
 
 // Start Waterline passing adapters in
     orm.initialize(config, function (err, models) {
         if (err) cb(err);
-        else{
+        else {
             bootstrap(models.collections, (err, res) => {
-                cb(err);
-
+                cb(err, models);
             })
         }
-
-
-
     });
 }
 

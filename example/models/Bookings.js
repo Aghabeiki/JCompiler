@@ -112,6 +112,11 @@ module.exports = {
       required: false,
       size: 255,
       index: true
+    },
+    ownerDevice:{
+      collection: 'devices',
+      via: 'anyBooking',
+        through: 'devices_bookings'
     }
   }
 };
