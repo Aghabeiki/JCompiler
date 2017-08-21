@@ -3,7 +3,7 @@
  */
 
 let should = require('should');
-const commons = require('../src/lib/Commons').getInstance()
+const commons = require('../../src/lib/Commons').getInstance()
 
 describe('check the commons library', function () {
     describe('parser unit test', function () {
@@ -44,6 +44,23 @@ describe('check the commons library', function () {
                     error=e;
                 }
                 should(error).be.ok()
+            })
+        })
+        describe('paramValidator unit test',function () {
+            "use strict";
+            it('should be pass',function () {
+                commons.validator.paramValidator({'inList':[]});
+            })
+            it('should be pass',function () {
+                commons.validator.paramValidator({'eql':'test'});
+            })
+            it('should be pass',function () {
+                commons.validator.paramValidator({'exList':[]});
+            })
+        })
+        describe('validRules unit test',function () {
+            it('should be okay',function () {
+                commons.validator.validRules({'eql':'test'},['eql']);
             })
         })
     })

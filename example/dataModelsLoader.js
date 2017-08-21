@@ -31,7 +31,7 @@ const config = {
         },
         myLocalMySql: {
             adapter: 'mysql',
-            host: 'localhost:8889',
+            host: 'localhost',
             database: 'JCompiler',
             user: 'root',
             password: ''
@@ -51,7 +51,7 @@ const config = {
 module.exports = function (cb) {
     "use strict";
     // const defaultConnection = 'myLocalMySql';
-    const defaultConnection = 'myDisk';
+    const defaultConnection = 'myLocalMySql';
 
     loadDataModels(defaultConnection).map((data) => {
         return Waterline.Collection.extend(data);
@@ -64,7 +64,9 @@ module.exports = function (cb) {
     orm.initialize(config, function (err, models) {
         if (err) cb(err);
         else {
+            console.log('waterline is connected');
             bootstrap(models.collections, (err, res) => {
+                console.log('preset data loaded');
                 cb(err, models);
             })
         }
@@ -74,6 +76,21 @@ module.exports = function (cb) {
 
 const bootstrap = function (collections, cb) {
     "use strict";
-    collections.devices.findOrCreate(require('./sampleData/Devices')).exec(cb);
+    let data = require('./sampleData/Devices');
+    // delete data.anyBooking;
+    //  delete data.anyFlights;
+    //   delete data.anyFerris;
+    //  delete data.anyCoaches;
+    collections.devices.create(data).exec((err, device) => {
+        if (err) {
+            cb(err);
+        }
+        else {
+            /*device.anyFlights.add(require('./sampleData/Devices').anyFlights);
+            device.anyBooking.add(require('./sampleData/Devices').anyBooking);
+            device.save(cb);*/
+            cb(null);
+        }
+    });
 
 }

@@ -51,7 +51,12 @@ const verbList = {
     "language": "",
     "currency": "",
     "city": "",
-    "country": "",
+    "country": {
+        inDevices: true,
+        maps: ['devices.country'],
+        acceptableOperand: ['eql', 'inList', 'exList'],
+        fieldName: 'country'
+    },
     "is_member": "",
     "flight_stats_notification": "",
     "campaign_notification": "",

@@ -1,4 +1,5 @@
 let verbs = require('./ValidVerbs');
+const operands = require('./operands');
 
 
 let Handler = null;
@@ -44,12 +45,15 @@ class Commons {
      * @desc <p>namespace:<b>validator</b></p><br><p> check for null, empty string, undefined and Object properties </p>
      * @example Commons.validator.isEmpty({}) => true
      * @param {Object} obj
+     * @param {boolean} checkEmptyObject if set true will check the object has any properties default is enable
      * @returns {boolean}
      */
 
-    isEmpty(obj) {
+    isEmpty(obj, checkEmptyObject) {
         "use strict";
-        return obj == null || obj == '' || obj == undefined || Object.keys(obj).length == 0
+        if (checkEmptyObject == undefined) checkEmptyObject = true;
+        return (obj == null || obj == '' || obj == undefined
+            || ( checkEmptyObject == true && Object.keys(obj).length == 0))
     }
 
 
@@ -207,13 +211,55 @@ class Commons {
     }
 
     /**
-     * @desc <p>namespcae:<b>commons</b><p>
+     * @desc <p>namespace:<b>commons</b><p>
      * @param {string} verb name {@link verbList}
      * @return {JSONObject} verb config
      */
 
     getVerbConfig(verb) {
         return verbs[verb];
+    }
+
+
+    /**
+     * @desc <p>namespace:<b>validator</b><p>
+     * @param {JSONObject} value
+     * @param {JSONObject} acceptableOperands
+     * @returns {boolean} true if the requested operands match all with acceptable operands under the fields config
+     */
+    validRules(value, acceptableOperands) {
+        const requestedOperands = Object.keys(value);
+
+        return requestedOperands.filter(requestedOperand => {
+            return acceptableOperands.indexOf(requestedOperand) != -1
+        }).length === requestedOperands.length;
+    }
+
+    /**
+     * @desc <p>namespace:<b>validator</b><p>
+     * @param values
+     * @returns {boolean}
+     */
+    paramValidator(values) {
+        let res = false;
+        Object.keys(values).forEach(operandKey => {
+            let parts = false;
+            operands[operandKey].type.split('|').forEach(type => {
+                switch (type) {
+                    case 'string':
+                        parts = typeof values[operandKey] == 'string';
+                        break;
+                    case 'number':
+                        parts = typeof values[operandKey] == 'number';
+                        break;
+                    case 'array':
+                        parts = Array.isArray(values[operandKey]);
+                        break;
+                }
+                res = parts || res;
+            })
+        })
+        return res;
     }
 }
 
@@ -242,7 +288,9 @@ module.exports = (function () {
                         isEmpty: tmp.isEmpty,
                         isLanguageISO: tmp.isLanguageISO,
                         isValidVerb: tmp.isValidVerb,
-                        topKeyValidator: tmp.topKeyValidator
+                        topKeyValidator: tmp.topKeyValidator,
+                        validRules: tmp.validRules,
+                        paramValidator: tmp.paramValidator
                     },
                     parser: {
                         getVerbsInString: tmp.getVerbsInString

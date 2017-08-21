@@ -1,12 +1,19 @@
 const commons = require('./Commons').getInstance()
 const operands = require('./operands')
 /**
+ * @private
+ */
+let Handler = null;
+
+
+/**
  * @classdesc Parser - singleton
  * @class
  * @hideconstructor
  */
 class Parser {
     constructor() {
+        Handler = this;
     }
 
     /**
@@ -63,7 +70,7 @@ class Parser {
      */
     RawTargetParser(rawTarget) {
         "use strict";
-        if (commons.validator.isEmpty(rawTarget)) {
+        if (commons.validator.isEmpty(rawTarget, false)) {
             throw new Error('target(s) is(are) missed or not valid');
         }
         else {
@@ -99,70 +106,89 @@ class Parser {
         }
     }
 
-    loadDeviceConditons(devicesRuls) {
-        let outjson = {};
-        let myDeviceRules = Object.keys(devicesRuls).map(key => {
+    /**
+     *
+     * @param {JSONObject}obj - a parsed operand style json file
+     * @param {JSONObject|string|number|array}value
+     * @returns {*}
+     * @private
+     */
+    putValueInThePlace(obj, value) {
+        Object.keys(obj).forEach(key => {
+            if (Array.isArray(obj[key])) {
+                obj[key] = [];
+                value.forEach(val => {
+                    obj[key].push(val);
+                })
+            }
+            else if (typeof value == 'string' || typeof  value == 'number' || typeof value == 'boolean') {
+                obj[key] = value;
+            }
+            else {
+                throw new Error(' an in valid operand style find in jCompiler configs');
+            }
+        })
+
+        return obj;
+    }
+
+    /**
+     *
+     * @param {string}filedName
+     * @param {JSONObject}ruleStyle
+     * @param {JSONObject|string|number|array}value
+     * @return {JSONObject}
+     * @private
+     */
+    ruleGenerator(filedName, ruleStyle, value) {
+        let tmp = JSON.parse(JSON.stringify(ruleStyle).replaceAll('filed_name', filedName));
+        tmp = Handler.putValueInThePlace(tmp, value);
+        return tmp;
+    }
+
+    /**
+     * format the rawTarget condition to waterline where statement
+     *
+     * @param {JSONObject}devicesRule
+     * @returns {JSONObject}
+     */
+    loadDeviceConditions(devicesRule) {
+
+        let outJSON = {};
+        Object.keys(devicesRule).map(key => {
             return {
-                value: devicesRuls[key].value,
-                config: devicesRuls[key].keyTarget
+                value: devicesRule[key].value,
+                config: devicesRule[key].keyTarget,
+                fieldName: key
             }
         }).filter(rules => {
             return rules.config.inDevices
         }).forEach(rules => {
-            let mTarget = rules.config.fieldName;
-            let mValue = rules.value.type;
-            let mOperand = rules.value;
-
-            // todo first check the rules is belong to the key
-            let mDevice = require('../../example/models/Devices');
-
-
-            if (mDevice.attributes.hasOwnProperty(mTarget)) {
-
-                Object.keys(mOperand).forEach(item => {
-                    let style
-                    let type
-
-
-                    switch (operands[item]) {
-                        case operands.eql:
-                            type = operands.eql.type
-                            style = operands.eql.style
-
-                            var typeList = type.split('|')
-                            typeList.forEach(t => {
-                                switch (typeof t) {
-                                    case 'string':
-                                        mValue.isString();
-                                        break
-                                    case 'number':
-                                        mValue.isNumber();
-                                }
-                            })
-
-                            break
-
-
-                    }
-
-                })
-
-
-                operands.eql(mValue)
+            if (!commons.validator.validRules(rules.value, rules.config.acceptableOperand)) {
+                throw new Error("operand is not valid  fieldName "
+                    + rules.fieldName + ' acceptable operands : '
+                    + JSON.stringify(rules.config.acceptableOperand))
             }
-
-
-            let mDevices = require(__dirname + '/example/models/Devices.js');
-
-
-            // todo first check the rules is belong to the key
-            // todo then check the rules type config ( in operands files under libs folder )
-            // todo generate the where jeson file like my output '{push_token: "test"};'
-            outjson['device_type'] = 'android';
+            if (!commons.validator.paramValidator(rules.value)) {
+                throw new Error("the requested compare value(s) type is not correct. fieldName "
+                    + rules.fieldName + ' acceptable operands : '
+                    + JSON.stringify(rules.config.acceptableOperand))
+            }
+            //todo  implement, multi operands as or condition in select
+            //       for example we have 2 operands in our value field,like 2 `eql` then it should
+            //          implement as or statement in waterline
+            outJSON = Object.keys(rules.value).map(key => {
+                return Handler.ruleGenerator(rules.fieldName, operands[key].style, rules.value[key]);
+            }).reduce((p, v) => {
+                Object.keys(v).forEach(key => {
+                    p[key] = v[key];
+                })
+                return p;
+            }, outJSON);
 
 
         })
-        return outjson;
+        return outJSON;
     }
 }
 

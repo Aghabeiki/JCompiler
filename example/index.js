@@ -9,7 +9,11 @@ let jCompiler = new JCompiler({
     device: {
         device_type: {
             eql: 'android'
+        },
+        country: {
+            eql:'my'
         }
+
     }
 }, {
     "en-us": {
@@ -23,22 +27,35 @@ let jCompiler = new JCompiler({
         "image_url": ""
     }
 });
+
+
 dataModel((err, models) => {
         if (err) {
-            throw new Error('waterline not loaded');
+            console.log('waterline not loaded ' + err.message);
         }
         else {
 
-            jCompiler.waterlineQueryFunctionBuilder('.collections').call(this, models, (err, rawPNSList) => {
-                "use strict";
-                if (err) {
-                    console.log(err);
-                }
-                else {
-                    console.dir(rawPNSList);
+            try {
+                console.log('jCompiler start working ')
+                jCompiler.waterlineQueryFunctionBuilder('.collections').call(this, models, (err, rawPNSList) => {
+                    "use strict";
+                    if (err) {
+                        console.log(err);
+                    }
+                    else {
+                        console.log('res:\n');
+                        console.dir(rawPNSList);
+                        console.log('\n')
+
+                    }
+                    console.log('jCompiler end;')
                     process.exit(1);
-                }
-            })
+                })
+            }
+            catch (e) {
+                console.log(e.message)
+            }
+
 
         }
     }

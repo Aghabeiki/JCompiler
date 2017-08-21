@@ -70,19 +70,20 @@ class JCompiler {
         // todo remember if it's on sails not need to populate like this
         let deviceConditions = 'devices.find({where:conditions}).populate([\'anyFlights\']).exec(cb)\n\r';
         let functionBody = '';
+        functionBody += defineDevices;
+        let rules = null;
 
         // check the target for device conditions
         if (Object.keys(target).indexOf('device') != -1) {
             // add the device data models to function body
-            functionBody += defineDevices;
-            let rules = parser.loadDeviceConditons(target['device']);
-            functionBody += deviceConditions.replace('conditions', JSON.stringify(rules));
+            rules = parser.loadDeviceConditions(target['device']);
+
         }
         else {
             // so fetch every things from devices
-            functionBody = 'cb(null)';
+            rules = {where: {}};
         }
-
+        functionBody += deviceConditions.replace('conditions', JSON.stringify(rules));
 
         return new Function('sails', 'cb', functionBody);
     }
