@@ -59,7 +59,8 @@ const verbList = {
     "device_type": {
         inDevices: true,
         maps: ['devices.device_type'],
-        acceptableOperand: ['eql', 'inList', 'exList']
+        acceptableOperand: ['eql', 'inList', 'exList'],
+        fieldName: 'device_type'
     },
     "device_os_version": "",
     "device_locale": "",

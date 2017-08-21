@@ -1,5 +1,5 @@
 const commons = require('./Commons').getInstance()
-
+const operands = require('./operands')
 /**
  * @classdesc Parser - singleton
  * @class
@@ -109,9 +109,57 @@ class Parser {
         }).filter(rules => {
             return rules.config.inDevices
         }).forEach(rules => {
+            let mTarget = rules.config.fieldName;
+            let mValue = rules.value.type;
+            let mOperand = rules.value;
+
+            // todo first check the rules is belong to the key
+            let mDevice = require('../../example/models/Devices');
+
+
+            if (mDevice.attributes.hasOwnProperty(mTarget)) {
+
+                Object.keys(mOperand).forEach(item => {
+                    let style
+                    let type
+
+
+                    switch (operands[item]) {
+                        case operands.eql:
+                            type = operands.eql.type
+                            style = operands.eql.style
+
+                            var typeList = type.split('|')
+                            typeList.forEach(t => {
+                                switch (typeof t) {
+                                    case 'string':
+                                        mValue.isString();
+                                        break
+                                    case 'number':
+                                        mValue.isNumber();
+                                }
+                            })
+
+                            break
+
+
+                    }
+
+                })
+
+
+                operands.eql(mValue)
+            }
+
+
+            let mDevices = require(__dirname + '/example/models/Devices.js');
+
+
             // todo first check the rules is belong to the key
             // todo then check the rules type config ( in operands files under libs folder )
             // todo generate the where jeson file like my output '{push_token: "test"};'
+            outjson['device_type'] = 'android';
+
 
         })
         return outjson;

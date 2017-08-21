@@ -13,3 +13,5 @@ const operands = {
         style: "filed_name:{'!':[$values]}" // todo not sure check in waterline documents
     }
 }
+
+module.exports = operands;

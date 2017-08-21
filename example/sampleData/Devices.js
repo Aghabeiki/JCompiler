@@ -16,5 +16,60 @@ module.exports = {
     app_version: '0',
     device_type: 'android',
     device_os_version: '0',
-    device_locale: 'en-us'
+    device_locale: 'en-us',
+    anyFlights:{
+        pnr: 'ABC',
+        airline_iata_code:'DD',
+        flight_number: 'AB123',
+        origin: 'IKA',
+        destination: 'KUL',
+        STDOrg: new Date('2017/1/1').toUTCString(),
+        STAOrg: new Date('2017/1/2').toUTCString()
+    },
+    anyFerris: {
+        pnr: 'ABC',
+        airline_iata_code:'DD',
+        flight_number: 'AB123',
+        origin: 'IKA',
+        destination: 'KUL',
+        STD: new Date('2017/1/1').toUTCString(),
+        STA: new Date('2017/1/2').toUTCString(),
+        STDOrg: new Date('2017/1/1').toUTCString(),
+        STAOrg: new Date('2017/1/2').toUTCString(),
+        departure_gate: '12'
+    },
+    anyCoaches: {
+        pnr: 'ABC',
+        airline_iata_code:'DD',
+        flight_number: 'AB123',
+        origin: 'IKA',
+        destination: 'KUL',
+        STD: new Date('2017/1/1').toUTCString(),
+        STA: new Date('2017/1/2').toUTCString(),
+        STDOrg: new Date('2017/1/1').toUTCString(),
+        STAOrg: new Date('2017/1/2').toUTCString(),
+        departure_gate: '12',
+        arrival_gate: '13'
+    },
+    anyBooking: {
+        pnr: 'ABC',
+        booking_no: new Date().toUTCString(),
+        airline_iata_code: new Date().toUTCString(),
+        campaign_id: new Date().toUTCString(),
+        booking_datetime: new Date(),
+        passenger_count: 100,
+        adult_count: 10,
+        child_count: 10,
+        infant_count: 10,
+        gender_male: 15,
+        gender_female: 15,
+        gender_others: 0,
+        currency: 'MYR',
+        amount: 100.1,
+        status: 'CONFIRM',
+        hold_datetime: new Date(),
+        appengine_citylatlong: '3.126677, 101.671881',
+        appengine_city: 'Kuala Lumpur',
+        appengine_country: 'Malaysia'
+    }
 }
