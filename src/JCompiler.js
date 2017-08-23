@@ -3,6 +3,7 @@
 const _target = new WeakMap()
 const _content = new WeakMap();
 const parser = require('./lib/Parser').getInstance();
+const validVerb = require('./lib/ValidVerbs');
 
 let Handler = null;
 
@@ -52,42 +53,61 @@ class JCompiler {
      * @param {JSONObject} List
      */
 
-    /**
-     * @desc <p>this function , generate the waterline search query function base to load <br>
-     *       data for next steps</p>
-     * @returns {waterlineQueryFunction}
-     */
-    waterlineQueryFunctionBuilder(prefix) {
-
+    loadPNS(sails, prefix) {
         if (prefix == undefined)
             prefix = '';
-        let target = this.target;
-        let defineDevices = ' let devices=sails' + prefix + '.devices;\n\r';
-        let defineBookings = ' let bookings=sails' + prefix + '.bookings\n\r';
-        let defineFlights = ' let flights=sails' + prefix + '.flights\n\r';
-        let defineFerris = ' let ferris=sails' + prefix + '.ferris\n\r';
-        let defineCoaches = ' let coaches=sails' + prefix + '.coaches\n\r';
-        // todo remember if it's on sails not need to populate like this
-        let deviceConditions = 'devices.find({where:conditions}).populate([\'anyFlights\']).exec(cb)\n\r';
-        let functionBody = '';
-        functionBody += defineDevices;
-        let rules = null;
+        let functionBody = 'return sails' + prefix + '.devices';
 
-        // check the target for device conditions
-        if (Object.keys(target).indexOf('device') != -1) {
+        let rules = {};
+        let flightFilter, bookingFilter;
+        flightFilter = bookingFilter = function (obj) {
+            return true;
+        }
+
+        const target = this.target;
+        const topKey = Object.keys(target);
+        if (topKey.indexOf('device') != -1) {
             // add the device data models to function body
             rules = parser.loadDeviceConditions(target['device']);
+        }
+        if (topKey.indexOf('flight') != -1) {
+            flightFilter = function (obj) {
+                let tmp = {};
+                tmp.commons = require('./lib/Commons').getInstance();
+                tmp.rules = parser.loadConditions(target['flight'], new Function('rules', 'return rules.config.isFlight'));
+                return new Function('obj', 'let that=this;\n\rreturn this.commons.validator.ruleValidator(obj, that.rules);').call(tmp, obj);
+            }
 
         }
-        else {
-            // so fetch every things from devices
-            rules = {where: {}};
+        if (topKey.indexOf('booking') != -1) {
+            bookingFilter = function (obj) {
+                let tmp = {};
+                tmp.commons = require('./lib/Commons').getInstance();
+                tmp.rules = parser.loadConditions(target['booking'], new Function('rules', 'return rules.config.isBooking'));
+                return new Function('obj', 'let that=this;\n\rreturn this.commons.validator.ruleValidator(obj, that.rules);').call(tmp, obj);
+            }
         }
-        functionBody += deviceConditions.replace('conditions', JSON.stringify(rules));
-
-        return new Function('sails', 'cb', functionBody);
+        return new Promise((resolve, reject) => {
+            (new Function('sails', functionBody))
+                .call(this, sails)
+                .find({where: rules})
+                .populate(['anyFlights', 'anyBooking'])
+                .then((devices) => {
+                    "use strict";
+                    const pns = devices.filter(device => {
+                        let out = true;
+                        out = out && device.anyFlights.filter(flightFilter).length !== 0
+                        out = out && device.anyBooking.filter(bookingFilter).length !== 0
+                        return out;
+                    });
+                    return [pns];
+                })
+                .spread(results => {
+                    "use strict";
+                    resolve(results);
+                })
+        });
     }
-
 }
 
 module.exports = JCompiler;

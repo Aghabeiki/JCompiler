@@ -6,27 +6,41 @@ const JCompiler = require('../index');
 // all android devices that travel to bangkok ,
 
 let jCompiler = new JCompiler({
-    device: {
-        device_type: {
-            eql: 'android'
-        },
-        country: {
-            eql:'my'
-        }
 
+        'device': {
+            gender: {
+                eql: 'man'
+            }
+        },
+        'booking': {
+            passenger_count: {
+                between: [1, 3]
+            }
+        }
+    },
+    {
+        "en-us":
+            {
+                "title":
+                    "this is a test message.",
+                "subtitle":
+                    "this is a test with var firstname {*firstname*}",
+                "message":
+                    "this is a test with var lastname {*lastname*}, firstname,{*firstname*}",
+                "action":
+                    "",
+                "display":
+                    true,
+                "button_text":
+                    "",
+                "button_url":
+                    "",
+                "image_url":
+                    ""
+            }
     }
-}, {
-    "en-us": {
-        "title": "this is a test message.",
-        "subtitle": "this is a test with var firstname {*firstname*}",
-        "message": "this is a test with var lastname {*lastname*}, firstname,{*firstname*}",
-        "action": "",
-        "display": true,
-        "button_text": "",
-        "button_url": "",
-        "image_url": ""
-    }
-});
+    )
+;
 
 
 dataModel((err, models) => {
@@ -37,20 +51,21 @@ dataModel((err, models) => {
 
             try {
                 console.log('jCompiler start working ')
-                jCompiler.waterlineQueryFunctionBuilder('.collections').call(this, models, (err, rawPNSList) => {
-                    "use strict";
-                    if (err) {
+                jCompiler.loadPNS(models, '.collections')
+                    .then(results => {
+                        "use strict";
+                        let res = results.map(res => {
+                            return res.push_token
+                        })
+                        console.dir(res)
+                        console.log(res.length);
+                        process.exit(0);
+                    })
+                    .catch((err) => {
+                        "use strict";
                         console.log(err);
-                    }
-                    else {
-                        console.log('res:\n');
-                        console.dir(rawPNSList);
-                        console.log('\n')
-
-                    }
-                    console.log('jCompiler end;')
-                    process.exit(1);
-                })
+                        process.exit(1);
+                    })
             }
             catch (e) {
                 console.log(e.message)

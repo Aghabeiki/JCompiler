@@ -161,22 +161,7 @@ describe('should check parser work correctly', function () {
     })
 
 
-    describe('putValueInThePlace unit test', function () {
-        it('should throw an error', function () {
-            "use strict";
-            let err = null;
-            try {
-                parser.putValueInThePlace({'test': {'test': 1}}, null);
-            }
-            catch (e) {
-                err = e;
-            }
-            should.exists(err, '`error` is not trowed');
-        })
-        it('should be okay', function () {
-            parser.putValueInThePlace({'inList': ['$valuse']}, [1, 2, 3]);
-        })
-    })
+
 
 })
 

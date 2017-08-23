@@ -11,6 +11,7 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
+    "bluebird": "^3.5.0",
     "docdash": "^0.4.0",
     "documentation": "^5.2.1",
     "jsdoc": "^3.5.4",
@@ -25,6 +26,7 @@
     "waterline": "^0.11.11"
   },
   "dependencies": {
-    "lcid": "^1.0.0"
+    "lcid": "^1.0.0",
+    "moment": "^2.18.1"
   }
 }

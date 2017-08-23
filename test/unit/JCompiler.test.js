@@ -41,26 +41,27 @@ describe('JCompiler test', function () {
 
         })
     })
-    describe('test waterlineQueryFunctionBuilder', function () {
-        it('should be ok', (done) => {
-            "use strict";
-
-            jCompiler.waterlineQueryFunctionBuilder().call(this, require('../helper/waterlineMock'), (err, res) => {
-                "use strict";
-                done(err);
-            })
-        })
-        it('should be ok( without any target config', (done) => {
-            let targetTmp = jCompiler.target;
-            jCompiler.target = {};
-            jCompiler.waterlineQueryFunctionBuilder('').call(this, require('../helper/waterlineMock'), (err, res) => {
-                "use strict";
-                jCompiler.target = targetTmp;
-                done(err);
-            })
-
+    describe('loadPNS unit test', function () {
+        it('should work well', function (done) {
+            jCompiler.loadPNS(require('../helper/waterlineMock'))
+                .then(res => {
+                    "use strict";
+                    done();
+                })
+                .catch(err => {
+                    "use strict";
+                    done(err);
+                })
 
         })
+        it('should throw an error', function (done) {
+            jCompiler.loadPNS(require('../helper/waterlineMock'), 'inValidPrefix')
+                .catch(err => {
+                    "use strict";
+                    should.exist(err);
+                    done();
+                })
 
+        })
     })
 })

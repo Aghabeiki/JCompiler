@@ -261,6 +261,57 @@ class Commons {
         })
         return res;
     }
+
+    operandExec(param, rule) {
+        let res
+        if (Array.isArray(rule)) {
+            // should check in list
+            res = rule.indexOf(param) !== -1;
+        }
+        else if (typeof rule == 'string' || typeof rule == 'number') {
+            res = param == rule;
+        }
+        else {
+            let andRes = true;
+            Object.keys(rule).forEach(operands => {
+                switch (operands) {
+                    case '<':
+                        andRes = andRes && ( param < rule['<'])
+                        break;
+                    case '>':
+                        andRes = andRes && ( param > rule['>'])
+                        break;
+                    case '!': // not in list
+                        if (Array.isArray(rule['!'])) {
+                            // not in list
+                            andRes = andRes && (rule['!'].filter(val => {
+                                return val == param
+                            }).length == 0)
+                        }
+                        else {
+                            // not eql
+                            andRes = andRes && ( param != rule['!'])
+                        }
+                        break;
+                }
+            })
+            res = res || andRes;
+        }
+        return res;
+    }
+
+    ruleValidator(param, rule) {
+        let rulesKey = Object.keys(rule);
+        let res = true;
+        for (let i = 0, ruleKey = rulesKey[i]; i < rulesKey.length && res; i++) {
+            res = res && Handler.operandExec(param[ruleKey], rule[ruleKey])
+        }
+        return res;
+    }
+
+    filedNameMachs(rules) {
+        return rules.fieldName == rules.config.fieldName;
+    }
 }
 
 module.exports = (function () {
@@ -290,7 +341,9 @@ module.exports = (function () {
                         isValidVerb: tmp.isValidVerb,
                         topKeyValidator: tmp.topKeyValidator,
                         validRules: tmp.validRules,
-                        paramValidator: tmp.paramValidator
+                        paramValidator: tmp.paramValidator,
+                        ruleValidator: tmp.ruleValidator,
+                        filedNameMachs: tmp.filedNameMachs
                     },
                     parser: {
                         getVerbsInString: tmp.getVerbsInString
