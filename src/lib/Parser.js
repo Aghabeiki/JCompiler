@@ -107,17 +107,16 @@ class Parser {
         }
     }
 
-    /**
-     * format the rawTarget condition to waterline where statement
-     *
-     * @param {JSONObject}devicesRule
-     * @returns {JSONObject}
-     */
-    loadDeviceConditions(devicesRule) {
-        return this.loadConditions(devicesRule, new Function('rules', 'return rules.config.isDevice'));
-    }
 
     loadConditions(devicesRule, filter) {
+        return {
+            general: Handler.loadConditionsImplement(devicesRule, filter, false),
+            dateTime: Handler.loadConditionsImplement(devicesRule, filter, true)
+        }
+    }
+
+    loadConditionsImplement(devicesRule, filter, loadDateTime) {
+        loadDateTime = loadDateTime || false;
         let outJSON = {};
         Object.keys(devicesRule).map(key => {
             return {
@@ -127,6 +126,24 @@ class Parser {
             }
         }).filter(rules => {
             return filter.call(this, rules);
+        }).filter(rules => {
+            let res = false;
+            Object.keys(rules.value).forEach(operand => {
+                res = res || (operands[operand].isDateTime || false)
+            })
+
+            if (loadDateTime == false && res == false) {
+                return true;
+            }
+            else if (loadDateTime == true && res == false) {
+                return false
+            }
+            else if ( loadDateTime == true && res==true){
+                return true;
+            }
+            else if ( loadDateTime==false && res== true){
+                return false;
+            }
         }).forEach(rules => {
             if (!commons.validator.validRules(rules.value, rules.config.acceptableOperand)) {
                 throw new Error("operand is not valid  fieldName "
@@ -135,12 +152,12 @@ class Parser {
             }
             if (!commons.validator.paramValidator(rules.value)) {
                 throw new Error("the requested compare value(s) type is not correct. fieldName "
-                    + rules.maps[1] + ' acceptable operands : '
+                    + rules.config.maps[1] + ' acceptable operands : '
                     + JSON.stringify(rules.config.acceptableOperand))
             }
             if (!commons.validator.filedNameMachs(rules)) {
                 throw new Error("the requested compare filedName(s) is not machs. fieldName "
-                    + rules.maps[1] + ' acceptable operands : '
+                    + rules.config.maps[1] + ' acceptable operands : '
                     + JSON.stringify(rules.config.acceptableOperand))
             }
             //todo  implement, multi operands as or condition in select

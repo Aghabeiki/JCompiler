@@ -3,8 +3,11 @@
 const _target = new WeakMap()
 const _content = new WeakMap();
 const parser = require('./lib/Parser').getInstance();
-const validVerb = require('./lib/ValidVerbs');
-
+const commons = require('./lib/Commons').getInstance();
+const generalCompare = (obj, rules) => {
+    return (commons.validator.ruleGeneralValidator(obj, rules.general) &&
+        commons.validator.ruleDateValidator(obj, rules.dateTime));
+};
 let Handler = null;
 
 /**
@@ -58,9 +61,11 @@ class JCompiler {
             prefix = '';
         let functionBody = 'return sails' + prefix + '.devices';
 
-        let rules = {};
-        let flightFilter, bookingFilter;
-        flightFilter = bookingFilter = function (obj) {
+        let rules = {
+            general: {}
+        };
+        let flightFilter, bookingFilter, deviceFilter, emptyRule;
+        emptyRule = flightFilter = bookingFilter = deviceFilter = function (obj) {
             return true;
         }
 
@@ -68,36 +73,45 @@ class JCompiler {
         const topKey = Object.keys(target);
         if (topKey.indexOf('device') != -1) {
             // add the device data models to function body
-            rules = parser.loadDeviceConditions(target['device']);
+            rules = parser.loadConditions(target['device'], new Function('rules', 'return rules.config.isDevice'));
+            deviceFilter = function (obj) {
+                return (commons.validator.ruleDateValidator(obj, rules.dateTime));
+            }
         }
         if (topKey.indexOf('flight') != -1) {
             flightFilter = function (obj) {
-                let tmp = {};
-                tmp.commons = require('./lib/Commons').getInstance();
-                tmp.rules = parser.loadConditions(target['flight'], new Function('rules', 'return rules.config.isFlight'));
-                return new Function('obj', 'let that=this;\n\rreturn this.commons.validator.ruleValidator(obj, that.rules);').call(tmp, obj);
+                rules = parser.loadConditions(target['flight'], new Function('rules', 'return rules.config.isFlight'));
+                return generalCompare(obj, rules);
             }
-
         }
         if (topKey.indexOf('booking') != -1) {
             bookingFilter = function (obj) {
-                let tmp = {};
-                tmp.commons = require('./lib/Commons').getInstance();
-                tmp.rules = parser.loadConditions(target['booking'], new Function('rules', 'return rules.config.isBooking'));
-                return new Function('obj', 'let that=this;\n\rreturn this.commons.validator.ruleValidator(obj, that.rules);').call(tmp, obj);
+                let rules = parser.loadConditions(target['booking'], new Function('rules', 'return rules.config.isBooking'));
+                return generalCompare(obj, rules);
             }
         }
         return new Promise((resolve, reject) => {
             (new Function('sails', functionBody))
                 .call(this, sails)
-                .find({where: rules})
+                .find({where: rules.general})
                 .populate(['anyFlights', 'anyBooking'])
                 .then((devices) => {
                     "use strict";
                     const pns = devices.filter(device => {
-                        let out = true;
-                        out = out && device.anyFlights.filter(flightFilter).length !== 0
-                        out = out && device.anyBooking.filter(bookingFilter).length !== 0
+                        let out;
+                        if (!deviceFilter(device)) {
+                            out = false;
+                        }
+                        else {
+
+                            out = true;
+                            if (flightFilter !== emptyRule)
+                                out = out && device.anyFlights.filter(flightFilter).length !== 0;
+                            if (bookingFilter !== emptyRule)
+                                out = out && device.anyBooking.filter(bookingFilter).length !== 0;
+
+                        }
+
                         return out;
                     });
                     return [pns];
@@ -107,6 +121,7 @@ class JCompiler {
                     resolve(results);
                 })
         });
+
     }
 }
 

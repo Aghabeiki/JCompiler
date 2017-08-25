@@ -1,0 +1,29 @@
+Thank you message:
+- Passenger has a flight with sta = in the past 30 minutes
+- Passenger location is equal to arrival destination
+Check-in reminder:
+- Flight departure is in 24 hours
+- Flight is domestic (not international)
+Check-in reminder 2:
+- Flight departure is in 5 hours
+- Flight is international
+- User didn’t check-in yet
+Targeted promotion:
+- English language
+- Live in Bangkok
+- Currently in Chiang Mai (radius 20 km)
+- Travels with one or more person
+Flight information:
+- Flight is in 6 hours
+- Flight is on time
+- Send message that includes flight number, destination city name, and departure time
+Frequent flyer:
+- User is a member
+- User has an average of 5 flights per month
+- User didn’t fly for 2 months
+First time users:
+- Users installed the application for the first time
+New app version:
+- Users updated their application to a new version
+Flight cancelled:
+- User is flying on a specific flight number and specific day

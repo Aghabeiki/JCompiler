@@ -40,11 +40,34 @@
  */
 
 const verbList = [
-    {"push_token": ""},
-    {"email_address": ""},
-    {"mobile_number": ""},
-    {"firstname": ""},
-    {"lastname": ""},
+    {
+        "email_address": {
+            maps: ['devices', 'email_address'],
+            acceptableOperand: ['eql'],
+            fieldName: 'email_address'
+        }
+    },
+    {
+        "mobile_number": {
+            maps: ['devices', 'mobile_number'],
+            acceptableOperand: ['eql'],
+            fieldName: 'mobile_number'
+        }
+    },
+    {
+        "firstname": {
+            maps: ['devices', 'firstname'],
+            acceptableOperand: ['eql'],
+            fieldName: 'firstname'
+        }
+    },
+    {
+        "lastname": {
+            maps: ['devices', 'lastname'],
+            acceptableOperand: ['eql'],
+            fieldName: 'lastname'
+        }
+    },
     {
         "gender": {
             maps: ['devices', 'gender'],
@@ -65,15 +88,47 @@ const verbList = [
     },
     {
         "date_of_birth": {
-            maps:['devices','date_of_birth'],
+            maps: ['devices', 'date_of_birth'],
             acceptableOperand: ['today'],
-            fieldName:'date_of_birth'
+            fieldName: 'date_of_birth'
         }
     },
-    {"passport_expiry": ""},
-    {"language": ""},
-    {"currency": ""},
-    {"city": ""},
+    {
+        "passport_expiry": {
+            maps: ['devices', 'passport_expiry'],
+            acceptableOperand: ['next', 'last', 'today'],
+            fieldName: 'passport_expiry'
+        }
+    },
+    {
+        "language": {
+            maps: ['devices', 'language'],
+            acceptableOperand: ['eql', 'inList', 'exList'],
+            fieldName: 'language',
+            valuePreProcessor: function (v) {
+                "use strict";
+                return v.toLowerCase();
+            }
+        }
+    },
+    {
+        "currency": {
+            maps: ['devices', 'currency'],
+            acceptableOperand: ['eql', 'inList', 'exList'],
+            fieldName: 'currency',
+            valuePreProcessor: function (v) {
+                "use strict";
+                return v.toLowerCase();
+            }
+        }
+    },
+    {
+        "city": {
+            maps: ['devices', 'city'],
+            acceptableOperand: ['eql', 'inList', 'exList'],
+            fieldName: 'city'
+        }
+    },
     {
         "country": {
             maps: ['devices', 'country'],
@@ -81,13 +136,53 @@ const verbList = [
             fieldName: 'country'
         }
     },
-    {"is_member": ""},
-    {"flight_stats_notification": ""},
-    {"campaign_notification": ""},
+    {
+        "is_member": {
+            maps: ['devices', 'gender'],
+            acceptableOperand: ['eql'],
+            fieldName: 'gender',
+            valuePreProcessor: function (v) {
+                let newVal = {};
+                const manWords = ['true', 'active']
+                Object.keys(v).forEach(key => {
+                    "use strict";
+                    newVal[key] = manWords.map(menWord => {
+                        return menWord.toLowerCase()
+                    }).indexOf(v[key]) != -1 ? 1 : 0
+                })
+                return newVal
+            }
+        }
+    },
+    {
+        "flight_stats_notification": {
+            maps: ['devices', 'country'],
+            acceptableOperand: ['eql', 'inList', 'exList'],
+            fieldName: 'country'
+        }
+    },
+    {
+        "campaign_notification": {
+            maps: ['devices', 'gender'],
+            acceptableOperand: ['eql'],
+            fieldName: 'gender',
+            valuePreProcessor: function (v) {
+                let newVal = {};
+                const manWords = ['true', 'active']
+                Object.keys(v).forEach(key => {
+                    "use strict";
+                    newVal[key] = manWords.map(menWord => {
+                        return menWord.toLowerCase()
+                    }).indexOf(v[key]) != -1 ? 1 : 0
+                })
+                return newVal
+            }
+        }
+    },
     {
         "app_version": {
             maps: ['devices', 'app_version'],
-            acceptableOperand: ['eql', 'lessThan', 'greaterThan', 'exList'],
+            acceptableOperand: ['eql', 'inList', 'exList'],
             fieldName: 'app_version'
         }
     },
@@ -106,7 +201,16 @@ const verbList = [
             fieldName: 'device_os_version'
         }
     },
-    {"device_locale": ""},
+    {
+        "device_locale": {
+            maps: ['devices', 'device_locale'],
+            acceptableOperand: ['eql', 'inList', 'exList'],
+            fieldName: 'device_locale',
+            valuePreProcessor: function (v) {
+                return v.toLowerCase();
+            }
+        }
+    },
     {
         "pnr": {
             maps: ['bookings', 'pnr'],
@@ -121,7 +225,14 @@ const verbList = [
             fieldName: 'flight_number'
         }
     },
-    {"origin_airport": ""},
+    {
+        "origin_airport": {
+
+            maps: ['flights', 'origin'],
+            acceptableOperand: ['eql', 'inList', 'exList'],
+            fieldName: 'destination_airport'
+        }
+    },
     {
         "destination_airport": {
 
@@ -130,8 +241,20 @@ const verbList = [
             fieldName: 'destination_airport'
         }
     },
-    {"std": ""},
-    {"sta": ""},
+    {
+        "std": {
+            maps: ['flights', 'std'],
+            acceptableOperand: ['next', 'last', 'today'],
+            fieldName: 'std'
+        }
+    },
+    {
+        "sta": {
+            maps: ['flights', 'sta'],
+            acceptableOperand: ['next', 'last', 'today'],
+            fieldName: 'sta'
+        }
+    },
     {
         "passenger_count": {
             maps: ['bookings', 'passenger_count'],
@@ -139,15 +262,35 @@ const verbList = [
             fieldName: 'passenger_count'
         }
     },
-    //  {"has_children": ""},
-    //  {"has_infant": ""},
-    {"payment_status": ""},
-    {"payment_hold_datetime": ""},
-    {"checkin_status": ""}//,
-    //  {"geofence": ""},
-    //   {"latitude": ""},
-    //   {"longitude": ""},
-    //   {"radius": ""}
+    {
+        "child_count": {
+            maps: ['bookings', 'child_count'],
+            acceptableOperand: ['eql', 'lessThan', 'greaterThan', 'exList', 'between'],
+            fieldName: 'child_count'
+        }
+    },
+    {
+        "infant_count": {
+            maps: ['bookings', 'infant_count'],
+            acceptableOperand: ['eql', 'lessThan', 'greaterThan', 'exList', 'between'],
+            fieldName: 'infant_count'
+        }
+    },
+    {"payment_status":  {
+        maps: ['bookings', 'status'],
+        acceptableOperand: ['eql', 'inList', 'exList'],
+        fieldName: 'payment_status'
+    }},
+    {"payment_hold_datetime": {
+        maps: ['bookings', 'hold_datetime'],
+        acceptableOperand: ['next', 'last', 'today'],
+        fieldName: 'std'
+    }}/*,
+    {"checkin_status": ""}, todo -> ask nazar
+    {"geofence": ""}, //
+    {"latitude": ""},
+    {"longitude": ""},
+    {"radius": ""}*/
 ].reduce((p, v) => {
     "use strict";
 

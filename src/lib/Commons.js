@@ -1,6 +1,6 @@
-let verbs = require('./ValidVerbs');
+const verbs = require('./ValidVerbs');
 const operands = require('./operands');
-
+const dateTypeverbs = ['minutes', 'hours', 'days', 'weeks', 'months', 'quarters', 'years'];
 
 let Handler = null;
 
@@ -25,6 +25,9 @@ class Commons {
             var target = this;
             return target.split(search).join(replacement);
         };
+        Date.prototype.unix = function () {
+            return Number.parseInt(this.getTime() / 1000);
+        }
         Handler = this;
     }
 
@@ -244,69 +247,193 @@ class Commons {
         let res = false;
         Object.keys(values).forEach(operandKey => {
             let parts = false;
-            operands[operandKey].type.split('|').forEach(type => {
-                switch (type) {
-                    case 'string':
-                        parts = typeof values[operandKey] == 'string';
-                        break;
-                    case 'number':
-                        parts = typeof values[operandKey] == 'number';
-                        break;
-                    case 'array':
-                        parts = Array.isArray(values[operandKey]);
-                        break;
+            if (operands[operandKey].isDateTime) {
+                /// in date time comparing we have complex query
+                if (operandKey.toLowerCase() !== 'today' && operands[operandKey].type.val == undefined
+                    && values[operandKey].val == undefined) {
+                    res = parts || true;
                 }
-                res = parts || res;
-            })
+                if (operandKey.toLowerCase() == 'today') {
+                    res = true;
+                }
+                else {
+
+                    let value = values[operandKey];
+                    res = parts || (typeof value.val === 'string' &&
+                        value.val.length !== 0 &&
+                        value.val.split(' ').length === 2 &&
+                        dateTypeverbs.indexOf(value.val.split(' ')[1].toLowerCase()) !== -1);
+                }
+
+            }
+            else {
+                operands[operandKey].type.split('|').forEach(type => {
+                    switch (type) {
+                        case 'string':
+                            parts = typeof values[operandKey] == 'string';
+                            break;
+                        case 'number':
+                            parts = typeof values[operandKey] == 'number';
+                            break;
+                        case 'array':
+                            parts = Array.isArray(values[operandKey]);
+                            break;
+                    }
+                    res = parts || res;
+                })
+            }
+
         })
         return res;
     }
 
-    operandExec(param, rule) {
-        let res
-        if (Array.isArray(rule)) {
-            // should check in list
-            res = rule.indexOf(param) !== -1;
-        }
-        else if (typeof rule == 'string' || typeof rule == 'number') {
-            res = param == rule;
-        }
-        else {
-            let andRes = true;
-            Object.keys(rule).forEach(operands => {
-                switch (operands) {
-                    case '<':
-                        andRes = andRes && ( param < rule['<'])
-                        break;
-                    case '>':
-                        andRes = andRes && ( param > rule['>'])
-                        break;
-                    case '!': // not in list
-                        if (Array.isArray(rule['!'])) {
-                            // not in list
-                            andRes = andRes && (rule['!'].filter(val => {
-                                return val == param
-                            }).length == 0)
-                        }
-                        else {
-                            // not eql
-                            andRes = andRes && ( param != rule['!'])
-                        }
-                        break;
-                }
-            })
-            res = res || andRes;
+
+    /**
+     * @private
+     * @param param
+     * @param rule
+     * @param exec
+     * @returns {boolean}
+     */
+    ruleValidator(param, rule, exec) {
+        let rulesKey = Object.keys(rule);
+        let res = true;
+        for (let i = 0, ruleKey = rulesKey[i]; i < rulesKey.length && res; i++) {
+            res = res && exec(param[ruleKey], rule[ruleKey])
         }
         return res;
     }
 
-    ruleValidator(param, rule) {
-        let rulesKey = Object.keys(rule);
-        let res = true;
-        for (let i = 0, ruleKey = rulesKey[i]; i < rulesKey.length && res; i++) {
-            res = res && Handler.operandExec(param[ruleKey], rule[ruleKey])
-        }
-        return res;
+    /**
+     *
+     * @param params
+     * @param rules
+     * @returns {boolean}
+     */
+    ruleGeneralValidator(params, rules) {
+        return Handler.ruleValidator(params, rules, (param, rule) => {
+            let res
+            if (Array.isArray(rule)) {
+                // should check in list
+                res = rule.indexOf(param) !== -1;
+            }
+            else if (typeof rule == 'string' || typeof rule == 'number') {
+                res = param == rule;
+            }
+            else {
+                let andRes = true;
+                Object.keys(rule).forEach(operands => {
+                    switch (operands) {
+                        case '<':
+                            andRes = andRes && ( param < rule['<'])
+                            break;
+                        case '>':
+                            andRes = andRes && ( param > rule['>'])
+                            break;
+                        case '!': // not in list
+                            if (Array.isArray(rule['!'])) {
+                                // not in list
+                                andRes = andRes && (rule['!'].filter(val => {
+                                    return val == param
+                                }).length == 0)
+                            }
+                            else {
+                                // not eql
+                                andRes = andRes && ( param != rule['!'])
+                            }
+                            break;
+                    }
+                })
+                res = res || andRes;
+            }
+            return res;
+        });
+    }
+
+    /**
+     *
+     * @param params
+     * @param rules
+     * @returns {boolean}
+     */
+    ruleDateValidator(params, rules) {
+        const moment = require('moment');
+        return Handler.ruleValidator(params, rules, (param, rule) => {
+            let compareTools = function (andRes, operands) {
+                const compareIt = function (a, b, operands) {
+                    let functionName = {
+                        '<=': 'isSameOrBefore',
+                        '>=': 'isSameOrAfter',
+                        '==': 'isSame'
+                    };
+                    if (rule.compareOptions.yy && rule.compareOptions.mm &&
+                        rule.compareOptions.dd && rule.compareOptions.h &&
+                        rule.compareOptions.m && rule.compareOptions.s) {
+                        return a[functionName[operands]](b);
+                    }
+
+                    let compare = function (a, b, op) {
+                        let fn = new Function('a', 'b', 'return a ' + op + 'b;')
+                        return fn.call({}, a, b);
+                    }
+                    let out = true;
+                    if (rule.compareOptions.yy == false && (rule.compareOptions.mm || rule.compareOptions.dd)) {
+                        if (rule.compareOptions.yy) {
+                            out = out && compare(a.year(), b.year(), operands);
+                        }
+                        if (out && rule.compareOptions.mm) {
+                            out = out && compare(a.month(), b.month(), operands);
+                        }
+                        if (out && rule.compareOptions.dd) {
+                            out = out && compare(a.date(), b.date(), operands);
+                        }
+                        if (out && rule.compareOptions.h) {
+                            out = out && compare(a.hour(), b.hour(), operands);
+                        }
+                        if (out && rule.compareOptions.m) {
+                            out = out && compare(a.minutes(), b.minutes(), operands);
+                        }
+                        if (out && rule.compareOptions.s) {
+                            out = out && compare(a.seconds(), b.seconds(), operands);
+                        }
+                    }
+                    else {
+                        functionName=functionName[operands]
+                        if (rule.compareOptions.yy) {
+                            out = out && a[functionName](b, 'years');
+                        }
+                        if (out && rule.compareOptions.mm) {
+                            out = out && a[functionName](b, 'months');
+                        }
+                        if (out && rule.compareOptions.dd) {
+                            out = out && a[functionName](b, 'days');
+                        }
+                        if (out && rule.compareOptions.h) {
+                            out = out && a[functionName](b, 'hours');
+                        }
+                        if (out && rule.compareOptions.m) {
+                            out = out && a[functionName](b, 'minutes');
+                        }
+                        if (out && rule.compareOptions.s) {
+                            out = out && a[functionName](b, 'seconds');
+                        }
+                    }
+
+                    return out;
+                }
+
+                if (param == null || param == undefined) {
+                    return false;
+                }
+                return andRes && compareIt(moment(param).utc(), rule[operands].utc(), operands);
+            }
+            return Object
+                .keys(rule)
+                .filter(key => {
+                    return key !== 'compareOptions'
+                })
+                .reduce(compareTools, true);
+        });
     }
 
     filedNameMachs(rules) {
@@ -342,7 +469,8 @@ module.exports = (function () {
                         topKeyValidator: tmp.topKeyValidator,
                         validRules: tmp.validRules,
                         paramValidator: tmp.paramValidator,
-                        ruleValidator: tmp.ruleValidator,
+                        ruleGeneralValidator: tmp.ruleGeneralValidator,
+                        ruleDateValidator: tmp.ruleDateValidator,
                         filedNameMachs: tmp.filedNameMachs
                     },
                     parser: {

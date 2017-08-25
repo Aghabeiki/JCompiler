@@ -34,7 +34,15 @@ const config = {
             host: 'localhost',
             database: 'JCompiler',
             user: 'root',
-            password: ''
+            password: '',
+            timezone: 'utc'
+        },
+        gcloud: {
+            adapter: 'mysql',
+            host: '104.199.183.208',
+            user: 'root', //optional
+            //   password: '', //optional
+            database: 'goquo_mobile' //optional
         },
         myDisk: {
             adapter: 'disk',
@@ -44,15 +52,13 @@ const config = {
     },
 
     defaults: {
-        migrate: 'drop'
+        migrate: 'safe'
     }
 
 };
 module.exports = function (cb) {
     "use strict";
-    // const defaultConnection = 'myLocalMySql';
-    const defaultConnection = 'myLocalMySql';
-
+     const defaultConnection = 'myLocalMySql';
     loadDataModels(defaultConnection).map((data) => {
         return Waterline.Collection.extend(data);
     }).forEach((data) => {
@@ -65,10 +71,11 @@ module.exports = function (cb) {
         if (err) cb(err);
         else {
             console.log('waterline is connected');
-            bootstrap(models.collections, (err, res) => {
+            cb(err, models);
+            /*bootstrap(models.collections, (err, res) => {
                 console.log('preset data loaded');
                 cb(err, models);
-            })
+            })*/
         }
     });
 }

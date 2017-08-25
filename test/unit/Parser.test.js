@@ -98,69 +98,6 @@ describe('should check parser work correctly', function () {
     })
 
 
-    describe('loadDeviceConditions unit test', function () {
-        it('should be okay', function () {
-                parser.loadDeviceConditions({
-                    "device_type": {
-                        "keyName": "device_type",
-                        "keyTarget": {
-                            "inDevices": true,
-                            "maps": ["devices.device_type"],
-                            "acceptableOperand": ["eql", "inList", "exList"],
-                            "fieldName": "device_type"
-                        },
-                        "value": {"eql": "android"}
-                    }
-                })
-            }
-        )
-        it('should throw an error', function () {
-            "use strict";
-            let err = null
-            try {
-                parser.loadDeviceConditions({
-                    "device_type": {
-                        "keyName": "device_type",
-                        "keyTarget": {
-                            "inDevices": true,
-                            "maps": ["devices.device_type"],
-                            "acceptableOperand": ["eql", "inList", "exList"],
-                            "fieldName": "device_type"
-                        },
-                        "value": {"test": "android"}
-                    }
-                });
-            }
-            catch (e) {
-                err = e;
-            }
-            should.exists(err, '`error` is not trowed');
-        })
-        it('should throw an error', function () {
-            "use strict";
-            let err = null
-            try {
-                parser.loadDeviceConditions({
-                    "device_type": {
-                        "keyName": "device_type",
-                        "keyTarget": {
-                            "inDevices": true,
-                            "maps": ["devices.device_type"],
-                            "acceptableOperand": ["eql", "inList", "exList"],
-                            "fieldName": "device_type"
-                        },
-                        "value": {"eql": ["android"]}
-                    }
-                });
-            }
-            catch (e) {
-                err = e;
-            }
-            should.exists(err, '`error` is not trowed');
-        })
-    })
-
-
 
 
 })

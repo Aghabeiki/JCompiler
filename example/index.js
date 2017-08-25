@@ -4,44 +4,56 @@ const JCompiler = require('../index');
 // example for device join with bookings
 // all android devices that travel to bangkok
 // all android devices that travel to bangkok ,
-
-let jCompiler = new JCompiler({
-
-        'device': {
-            gender: {
-                eql: 'man'
-            }
+let jCompiler = null;
+try {
+    jCompiler = new JCompiler({
+            'device': {
+                passport_expiry: {
+                    next: {
+                        val:'10 years'
+                    }
+                }
+            }/*,
+            'booking': {
+                passenger_count: {
+                    between: [1, 4]
+                }
+            }*/
         },
-        'booking': {
-            passenger_count: {
-                between: [1, 3]
-            }
+        {
+            "en-us":
+                {
+                    "title":
+                        "this is a test message.",
+                    "subtitle":
+                        "this is a test with var firstname {*firstname*}",
+                    "message":
+                        "this is a test with var lastname {*lastname*}, firstname,{*firstname*}",
+                    "action":
+                        "",
+                    "display":
+                        true,
+                    "button_text":
+                        "",
+                    "button_url":
+                        "",
+                    "image_url":
+                        ""
+                }
         }
-    },
-    {
-        "en-us":
-            {
-                "title":
-                    "this is a test message.",
-                "subtitle":
-                    "this is a test with var firstname {*firstname*}",
-                "message":
-                    "this is a test with var lastname {*lastname*}, firstname,{*firstname*}",
-                "action":
-                    "",
-                "display":
-                    true,
-                "button_text":
-                    "",
-                "button_url":
-                    "",
-                "image_url":
-                    ""
-            }
-    }
     )
-;
 
+}
+catch (e) {
+    console.log(e.message)
+    process.exit(1);
+}
+
+
+function parseHrtimeToSeconds(hrtime) {
+    var seconds = (hrtime[0] + (hrtime[1] / 1e9)).toFixed(3);
+    return seconds;
+}
 
 dataModel((err, models) => {
         if (err) {
@@ -51,6 +63,7 @@ dataModel((err, models) => {
 
             try {
                 console.log('jCompiler start working ')
+                var start = process.hrtime();
                 jCompiler.loadPNS(models, '.collections')
                     .then(results => {
                         "use strict";
@@ -59,6 +72,8 @@ dataModel((err, models) => {
                         })
                         console.dir(res)
                         console.log(res.length);
+                        var seconds = parseHrtimeToSeconds(process.hrtime(start));
+                        console.log('jCompiler takes ' + seconds + ' seconds');
                         process.exit(0);
                     })
                     .catch((err) => {
@@ -68,7 +83,7 @@ dataModel((err, models) => {
                     })
             }
             catch (e) {
-                console.log(e.message)
+                console.dir(e)
             }
 
 
