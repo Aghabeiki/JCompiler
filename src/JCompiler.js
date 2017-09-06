@@ -119,8 +119,9 @@ class JCompiler {
                     resolve(results.map(pns => {
                         let tmp = {};
                         tmp.pnsID = pns.push_token;
+                        tmp.lang = pns.device_locale || 'en-us';
                         let params;
-                        if (Handler.content[pns.device_locale.toLowerCase()] !== undefined) {
+                        if (pns.device_locale !== undefined && pns.device_locale !== null && Handler.content[pns.device_locale.toLowerCase()] !== undefined) {
                             params = Handler.content[pns.device_locale.toLowerCase()];
                         }
                         else if (Handler.content['en-us'] !== undefined) {
