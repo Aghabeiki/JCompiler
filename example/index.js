@@ -24,7 +24,7 @@ try {
             "en-us":
                 {
                     "title":
-                        "this is a test message.",
+                        "this is a test message.{*child_count*}",
                     "subtitle":
                         "this is a test with var firstname {*firstname*}",
                     "message":
@@ -67,11 +67,9 @@ dataModel((err, models) => {
                 jCompiler.loadPNS(models, '.collections')
                     .then(results => {
                         "use strict";
-                        let res = results.map(res => {
-                            return res.push_token
-                        })
-                        console.dir(res)
-                        console.log(res.length);
+
+                        console.dir(results)
+                        console.log(results.length);
                         var seconds = parseHrtimeToSeconds(process.hrtime(start));
                         console.log('jCompiler takes ' + seconds + ' seconds');
                         process.exit(0);

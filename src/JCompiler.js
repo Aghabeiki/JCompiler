@@ -6,7 +6,7 @@ const parser = require('./lib/Parser').getInstance();
 const commons = require('./lib/Commons').getInstance();
 const generalCompare = (obj, rules) => {
     return (commons.validator.ruleGeneralValidator(obj, rules.general) &&
-        commons.validator.ruleDateValidator(obj, rules.dateTime));
+    commons.validator.ruleDateValidator(obj, rules.dateTime));
 };
 let Handler = null;
 
@@ -103,25 +103,75 @@ class JCompiler {
                             out = false;
                         }
                         else {
-
                             out = true;
                             if (flightFilter !== emptyRule)
                                 out = out && device.anyFlights.filter(flightFilter).length !== 0;
                             if (bookingFilter !== emptyRule)
                                 out = out && device.anyBooking.filter(bookingFilter).length !== 0;
-
                         }
-
                         return out;
                     });
                     return [pns];
                 })
                 .spread(results => {
                     "use strict";
-                    resolve(results);
-                })
-        });
 
+                    resolve(results.map(pns => {
+                        let tmp = {};
+                        tmp.pnsID = pns.push_token;
+                        let params;
+                        if (Handler.content[pns.device_locale.toLowerCase()] !== undefined) {
+                            params = Handler.content[pns.device_locale.toLowerCase()];
+                        }
+                        else if (Handler.content['en-us'] !== undefined) {
+                            params = Handler.content['en-us'];
+                        }
+                        else {
+                            params = Handler.content[Object.keys(Handler.content)[0]];
+                        }
+                        tmp.params = {};
+                        Object.keys(params).map(key => {
+                            "use strict";
+                            return params[key];
+                        }).reduce((p, v) => {
+                            "use strict";
+                            v.forEach(param => {
+                                if (p.filter(key => {
+                                        return key.name == param.name
+                                    }).length !== 1)
+                                    p.push(param);
+                            })
+                            return p;
+                        }, []).forEach(param => {
+
+                            let val = '';
+                            switch (param.target.maps[0]) {
+                                case 'devices':
+                                    val = pns[param.target.maps[1]];
+                                    break;
+                                case 'flights':
+                                    val = pns.anyFlights.reduce((p, v, i, arr) => {
+                                        "use strict";
+                                        return p + (i != 0 ? ',' : '') + v[param.target.maps[1]];
+                                    }, '');
+                                    break;
+                                case 'bookings':
+                                    val = pns.anyBooking.reduce((p, v, i, arr) => {
+                                        "use strict";
+                                        return p + (i != 0 ? ',' : '') + v[param.target.maps[1]];
+                                    }, '');
+                                    break;
+                                default:
+                                    val = 'NotFound';
+                                    break;
+                            }
+                            tmp.params[param.name] = val;
+                        })
+                        return tmp;
+                    }));
+                })
+                .catch(reject);
+        });
     }
 }
 
