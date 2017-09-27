@@ -9,12 +9,15 @@ try {
     jCompiler = new JCompiler({
             'device': {
                 passport_expiry: {
-                    next: {
+                    last: {
                         val:'10 years'
                     }
+                },
+                country:{
+                    inList:['my']
                 }
             }/*,
-            'booking': {
+            'dev': {
                 passenger_count: {
                     between: [1, 4]
                 }
@@ -24,11 +27,11 @@ try {
             "en-us":
                 {
                     "title":
-                        "this is a test message.{*child_count*}",
+                        "Expire Date",
                     "subtitle":
-                        "this is a test with var firstname {*firstname*}",
+                        "Hi {*firstname*}",
                     "message":
-                        "this is a test with var lastname {*lastname*}, firstname,{*firstname*}",
+                        "Hi {*firstname*}, your passport expired at {*passport_expiry*}",
                     "action":
                         "",
                     "display":

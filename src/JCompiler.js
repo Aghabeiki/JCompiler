@@ -2,8 +2,27 @@
 
 const _target = new WeakMap()
 const _content = new WeakMap();
+const momentJS = require('moment');
 const parser = require('./lib/Parser').getInstance();
 const commons = require('./lib/Commons').getInstance();
+const isValidDate = function (target) {
+    let d = new Date(target);
+    if (Object.prototype.toString.call(d) === "[object Date]") {
+        // it is a date
+        if (isNaN(d.getTime())) {  // d.valueOf() could also work
+            // date is not valid
+            return false;
+        }
+        else {
+            // date is valid
+            return true;
+        }
+    }
+    else {
+        // not a date
+        return false;
+    }
+}
 const generalCompare = (obj, rules) => {
     return (commons.validator.ruleGeneralValidator(obj, rules.general) &&
     commons.validator.ruleDateValidator(obj, rules.dateTime));
@@ -149,6 +168,26 @@ class JCompiler {
                             switch (param.target.maps[0]) {
                                 case 'devices':
                                     val = pns[param.target.maps[1]];
+                                    try {
+                                        if (val !== undefined && val !== null && isValidDate(val)) {
+                                            let tz = require('countryjs').timezones(pns.country);
+                                            if (pns.latitude !== null && pns.latitude !== undefined) {
+                                                let tzwhere = require('tzwhere')
+                                                tzwhere.init();
+                                                let min = tzwhere.tzOffsetAt(pns.latitude, pns.longitude) / 60000;
+                                                val = momentJS(val).utcOffset(min).format('DD-MMM-YYYY hh:mm A');
+                                            }
+                                            else if (tz !== undefined && tz !== null && tz.length >= 0) {
+                                                val = momentJS(val).utcOffset(tz[0].replace('UTC', '')).format('DD-MMM-YYYY hh:mm A');
+                                            }
+                                            else {
+                                                val = momentJS(val).format('DD-MMM-YYYY hh:mm A') + " (in UTC timezone) ";
+                                            }
+
+                                        }
+                                    }
+                                    catch (err) {
+                                    }
                                     break;
                                 case 'flights':
                                     val = pns.anyFlights.reduce((p, v, i, arr) => {
