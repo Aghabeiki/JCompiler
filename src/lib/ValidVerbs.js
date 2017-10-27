@@ -1,7 +1,7 @@
 /**
  * @namespace  verbList
  * @desc <p> the valid verbs</p<br>
- * @property {string} push_token - scope : user
+ * @property {string} push_token - scope : device
  * @property email_address
  * @property mobile_number
  * @property firstname
@@ -80,7 +80,7 @@ const verbList = [
                     "use strict";
                     newVal[key] = manWords.map(menWord => {
                         return menWord.toLowerCase()
-                    }).indexOf(v[key]) != -1 ? 1 : 0
+                    }).indexOf(v[key].val) != -1 ? 1 : 0
                 })
                 return newVal
             }
