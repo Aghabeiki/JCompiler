@@ -32,4 +32,5 @@ module.exports = {
         return res;
     }
 }
+module.exports=require('./src/JCompiler');
 

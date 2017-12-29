@@ -1,6 +1,6 @@
 const verbs = require('./ValidVerbs');
 const operands = require('./operands');
-const dateTypeverbs = ['minutes', 'hours', 'days', 'weeks', 'months', 'quarters', 'years'];
+const dateTypeVerbs = ['minutes', 'hours', 'days', 'weeks', 'months', 'quarters', 'years'];
 
 let Handler = null;
 
@@ -262,7 +262,7 @@ class Commons {
                     res = parts || (typeof value.val === 'string' &&
                         value.val.length !== 0 &&
                         value.val.split(' ').length === 2 &&
-                        dateTypeverbs.indexOf(value.val.split(' ')[1].toLowerCase()) !== -1);
+                        dateTypeVerbs.indexOf(value.val.split(' ')[1].toLowerCase()) !== -1);
                 }
 
             }

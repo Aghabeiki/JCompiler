@@ -21,16 +21,11 @@ describe('JCompiler test', function () {
             try {
                 jCompiler = new JCompiler({
                     device: {
-                        push_token: {
-                            eql: 'something'
+                        mobile_number: {
+                            eql: '0127623452'
                         }
                     }
                 }, sampleInput.content);
-                //todo two next lines will be removed
-                jCompiler.target
-                jCompiler.content
-
-
             }
             catch (e) {
                 error = e;

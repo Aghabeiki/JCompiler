@@ -1,7 +1,6 @@
 /**
  * @namespace  verbList
  * @desc <p> the valid verbs</p<br>
- * @property {string} push_token - scope : device
  * @property email_address
  * @property mobile_number
  * @property firstname

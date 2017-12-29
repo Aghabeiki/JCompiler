@@ -85,7 +85,7 @@ class Parser {
                 topKey.forEach(key => {
                     let tmpVerbKeys = Object.keys(rawTarget[key]);
                     if (tmpVerbKeys.filter(commons.validator.isValidVerb).length != tmpVerbKeys.length) {
-                        throw new Error('target' + key + '  is not valid');
+                        throw new Error('target ' + key + '  is not valid');
                     }
                     else {
                         targets[key] = tmpVerbKeys.map(verbKey => {
