@@ -92,6 +92,51 @@ const operands = {
             return tmp;
         }
     },
+    equalExactDate: {
+        type: {
+            specificDate: 'Your target date.acceptable format : "YYYY-MM-DD ZZ" '
+        },
+        get compareOptions() {
+            "use strict";
+            return {
+                yy: true,
+                mm: true,
+                dd: true,
+                h: false,
+                m: false,
+                s: false
+            }
+        },
+        isDateTime: true,
+        style: function (filedName, value) {
+            let compareOptions
+            const that = this;
+            if (value.compareOptions) {
+                compareOptions = {
+                    yy: value.compareOptions.yy === undefined ? that.compareOptions.yy : value.compareOptions.yy,
+                    mm: value.compareOptions.mm === undefined ? that.compareOptions.mm : value.compareOptions.mm,
+                    dd: value.compareOptions.dd === undefined ? that.compareOptions.dd : value.compareOptions.dd,
+                    h: value.compareOptions.h === undefined ? that.compareOptions.h : value.compareOptions.h,
+                    m: value.compareOptions.m === undefined ? that.compareOptions.m : value.compareOptions.m,
+                    s: value.compareOptions.s === undefined ? that.compareOptions.s : value.compareOptions.s
+                }
+            } else {
+                compareOptions = that.compareOptions
+            }
+            let tmp = {};
+            tmp[filedName] = {
+                '==': moment(value.specificDate.split(' ').reduce((p, v, index) => {
+                        p.push(v);
+                        if (!index)
+                            p.push(moment().format('HH:mm:SS'));
+                        return p;
+                    }, []).join(' ')
+                    , 'YYYY-MM-DD HH:mm:SS ZZ').utc(),
+                compareOptions: compareOptions
+            };
+            return tmp;
+        }
+    },
     next: {
         type: {
             val: 'string verbs'

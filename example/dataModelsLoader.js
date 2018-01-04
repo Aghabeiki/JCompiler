@@ -71,11 +71,11 @@ module.exports = function (cb) {
         if (err) cb(err);
         else {
             console.log('waterline is connected');
-            cb(err, models);
-            /*bootstrap(models.collections, (err, res) => {
+           // cb(err, models);
+            bootstrap(models.collections, (err, res) => {
                 console.log('preset data loaded');
                 cb(err, models);
-            })*/
+            })
         }
     });
 }
@@ -84,20 +84,32 @@ module.exports = function (cb) {
 const bootstrap = function (collections, cb) {
     "use strict";
     let data = require('./sampleData/Devices');
+    let coash=require('./sampleData/Coaches');
+    async function  orchestra(){
+        let res=[];
+        try{
+            res.push(await collections.devices.destroy());
+            res.push(await collections.devices.create(data));
+            res.push(await collections.coaches.destroy());
+            res.push(await collections.coaches.create(coash));
+        }
+        catch (err){
+            res=err;
+        }
+        return res;
+    };
+    orchestra()
+        .then((res)=>{
+            if(res instanceof  Error){
+                cb(res);
+            }
+            else{
+                cb(null);
+            }
+        }).catch(cb);
     // delete data.anyBooking;
     //  delete data.anyFlights;
     //   delete data.anyFerris;
     //  delete data.anyCoaches;
-    collections.devices.create(data).exec((err, device) => {
-        if (err) {
-            cb(err);
-        }
-        else {
-            /*device.anyFlights.add(require('./sampleData/Devices').anyFlights);
-            device.anyBooking.add(require('./sampleData/Devices').anyBooking);
-            device.save(cb);*/
-            cb(null);
-        }
-    });
 
 }

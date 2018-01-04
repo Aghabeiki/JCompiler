@@ -1,5 +1,6 @@
 const verbs = require('./ValidVerbs');
 const operands = require('./operands');
+const _ = require('lodash');
 const dateTypeVerbs = ['minutes', 'hours', 'days', 'weeks', 'months', 'quarters', 'years'];
 
 let Handler = null;
@@ -249,31 +250,40 @@ class Commons {
             let parts = false;
             if (operands[operandKey].isDateTime) {
                 /// in date time comparing we have complex query
-                if (operandKey.toLowerCase() !== 'today' && operands[operandKey].type.val == undefined
-                    && values[operandKey].val == undefined) {
+                // todo implement load value structure from operands config file.
+                if (operandKey.toLowerCase() !== 'today' && operands[operandKey].type.val === undefined
+                    && values[operandKey].val === undefined) {
                     res = parts || true;
                 }
-                if (operandKey.toLowerCase() == 'today') {
+                if (operandKey.toLowerCase() === 'today') {
+                    res = true;
+                }
+                // to handel equal exact date
+                else if (operandKey === 'equalExactDate' && values[operandKey].specificDate) {
                     res = true;
                 }
                 else {
-
                     let value = values[operandKey];
                     res = parts || (typeof value.val === 'string' &&
                         value.val.length !== 0 &&
                         value.val.split(' ').length === 2 &&
                         dateTypeVerbs.indexOf(value.val.split(' ')[1].toLowerCase()) !== -1);
                 }
-
+            }
+            else if (_.isObject(values[operandKey]) && Object.keys(values[operandKey]).length === 1
+                && values[operandKey].target && typeof  values[operandKey].target === 'string') {
+                // For compare two pair.
+                parts = this.isValidVerb(values[operandKey].target);
+                res = parts || res;
             }
             else {
                 operands[operandKey].type.split('|').forEach(type => {
                     switch (type) {
                         case 'string':
-                            parts = typeof values[operandKey] == 'string';
+                            parts = typeof values[operandKey] === 'string';
                             break;
                         case 'number':
-                            parts = typeof values[operandKey] == 'number';
+                            parts = typeof values[operandKey] === 'number';
                             break;
                         case 'array':
                             parts = Array.isArray(values[operandKey]);
@@ -282,11 +292,9 @@ class Commons {
                     res = parts || res;
                 })
             }
-
         })
         return res;
     }
-
 
     /**
      * @private
@@ -312,12 +320,12 @@ class Commons {
      */
     ruleGeneralValidator(params, rules) {
         return Handler.ruleValidator(params, rules, (param, rule) => {
-            let res
+            let res = null;
             if (Array.isArray(rule)) {
                 // should check in list
                 res = rule.indexOf(param) !== -1;
             }
-            else if (typeof rule == 'string' || typeof rule == 'number') {
+            else if (typeof rule === 'string' || typeof rule === 'number') {
                 res = param == rule;
             }
             else {
@@ -333,13 +341,11 @@ class Commons {
                         case '!': // not in list
                             if (Array.isArray(rule['!'])) {
                                 // not in list
-                                andRes = andRes && (rule['!'].filter(val => {
-                                    return val == param
-                                }).length == 0)
+                                andRes = andRes && !rule['!'].filter(val => val === param).length;
                             }
                             else {
                                 // not eql
-                                andRes = andRes && ( param != rule['!'])
+                                andRes = andRes && param !== rule['!'];
                             }
                             break;
                     }
@@ -377,7 +383,7 @@ class Commons {
                         return fn.call({}, a, b);
                     }
                     let out = true;
-                    if (rule.compareOptions.yy == false && (rule.compareOptions.mm || rule.compareOptions.dd)) {
+                    if (!rule.compareOptions.yy && (rule.compareOptions.mm || rule.compareOptions.dd)) {
                         if (rule.compareOptions.yy) {
                             out = out && compare(a.year(), b.year(), operands);
                         }
@@ -398,7 +404,7 @@ class Commons {
                         }
                     }
                     else {
-                        functionName=functionName[operands]
+                        functionName = functionName[operands]
                         if (rule.compareOptions.yy) {
                             out = out && a[functionName](b, 'years');
                         }
@@ -422,7 +428,7 @@ class Commons {
                     return out;
                 }
 
-                if (param == null || param == undefined) {
+                if (param === null || param === undefined) {
                     return false;
                 }
                 return andRes && compareIt(moment(param).utc(), rule[operands].utc(), operands);
@@ -436,32 +442,31 @@ class Commons {
         });
     }
 
+    ruleInDeepValidator(params, rules) {
+        return true;
+    }
+
     filedNameMachs(rules) {
-        return rules.fieldName == rules.config.fieldName;
+        return rules.fieldName === rules.config.fieldName;
     }
 }
 
 module.exports = (function () {
-    let instance;
+    let instance = null;
 
     function createInstance() {
-        var object = new Commons();
-
-        return object;
+        return new Commons();
     }
 
     return {
         getInstance: function () {
             if (!instance) {
-                let tmp = createInstance();
-
+                const tmp = createInstance();
                 instance = {
-
                     commons: {
                         replaceAll: tmp.replaceAll,
                         getVerbConfig: tmp.getVerbConfig
                     },
-
                     validator: {
                         isEmpty: tmp.isEmpty,
                         isLanguageISO: tmp.isLanguageISO,
@@ -471,6 +476,7 @@ module.exports = (function () {
                         paramValidator: tmp.paramValidator,
                         ruleGeneralValidator: tmp.ruleGeneralValidator,
                         ruleDateValidator: tmp.ruleDateValidator,
+                        ruleInDeepValidator: tmp.ruleInDeepValidator,
                         filedNameMachs: tmp.filedNameMachs
                     },
                     parser: {

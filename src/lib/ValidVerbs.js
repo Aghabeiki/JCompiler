@@ -30,6 +30,7 @@
  * @property has_infant
  * @property payment_status
  * @property payment_hold_datetime
+ * @property live_location_city_name
  * @property checkin_status
  * @property geofence
  * @property latitude
@@ -95,7 +96,7 @@ const verbList = [
     {
         "passport_expiry": {
             maps: ['devices', 'passport_expiry'],
-            acceptableOperand: ['next', 'last', 'today'],
+            acceptableOperand: ['next', 'last', 'today', 'equalExactDate'],
             fieldName: 'passport_expiry'
         }
     },
@@ -275,16 +276,29 @@ const verbList = [
             fieldName: 'infant_count'
         }
     },
-    {"payment_status":  {
-        maps: ['bookings', 'status'],
-        acceptableOperand: ['eql', 'inList', 'exList'],
-        fieldName: 'payment_status'
-    }},
-    {"payment_hold_datetime": {
-        maps: ['bookings', 'hold_datetime'],
-        acceptableOperand: ['next', 'last', 'today'],
-        fieldName: 'std'
-    }}/*,
+    {
+        "payment_status": {
+            maps: ['bookings', 'status'],
+            acceptableOperand: ['eql', 'inList', 'exList'],
+            fieldName: 'payment_status'
+        }
+    },
+    {
+        "payment_hold_datetime": {
+            maps: ['bookings', 'hold_datetime'],
+            acceptableOperand: ['next', 'last', 'today'],
+            fieldName: 'std'
+        }
+    },
+    {
+        "live_location_city_name": {
+            maps: ['devices', 'appengine_city'],
+            acceptableOperand: ['eql', 'inList', 'exList'],
+            fieldName: 'appengine_city_under_device'
+        }
+    }
+
+    /*,
     {"checkin_status": ""}, todo -> ask nazar
     {"geofence": ""}, //
     {"latitude": ""},
@@ -292,21 +306,19 @@ const verbList = [
     {"radius": ""}*/
 ].reduce((p, v) => {
     "use strict";
-
-
     let key = Object.keys(v)[0];
     p[key] = {
         maps: v[key].maps || [],
         acceptableOperand: v[key].acceptableOperand || [],
         fieldName: key,
         get isDevice() {
-            return this.maps[0] == 'devices'
+            return this.maps[0] === 'devices'
         },
         get isFlight() {
-            return this.maps[0] == 'flights'
+            return this.maps[0] === 'flights'
         },
         get isBooking() {
-            return this.maps[0] == 'bookings'
+            return this.maps[0] === 'bookings'
         },
         valuePreProcessor: v[key].valuePreProcessor || function (value) {
             return value

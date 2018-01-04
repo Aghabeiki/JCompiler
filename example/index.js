@@ -7,19 +7,19 @@ const JCompiler = require('../index');
 let jCompiler = null;
 try {
     jCompiler = new JCompiler({
-            'device': {
-                passport_expiry: {
-                    last: {
-                        val:'10 years'
-                    }
+            device:{
+                live_location_city_name:{
+                eql:{
+                    target:'city'
                 },
-                country:{
-                    inList:['my']
-                }
-            }/*,
-            'dev': {
-                passenger_count: {
-                    between: [1, 4]
+                    //inList:['mamad abad']
+            },
+        }
+            /*'device': {
+                passport_expiry: {
+                    equalExactDate: {
+                        specificDate:'2017-08-25 +08:00'
+                    }
                 }
             }*/
         },

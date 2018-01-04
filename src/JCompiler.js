@@ -3,6 +3,7 @@
 const _target = new WeakMap()
 const _content = new WeakMap();
 const momentJS = require('moment');
+const _ = require('lodash');
 const parser = require('./lib/Parser').getInstance();
 const commons = require('./lib/Commons').getInstance();
 const isValidDate = function (target) {
@@ -25,7 +26,7 @@ const isValidDate = function (target) {
 }
 const generalCompare = (obj, rules) => {
     return (commons.validator.ruleGeneralValidator(obj, rules.general) &&
-    commons.validator.ruleDateValidator(obj, rules.dateTime));
+        commons.validator.ruleDateValidator(obj, rules.dateTime));
 };
 let Handler = null;
 
@@ -76,7 +77,7 @@ class JCompiler {
      */
 
     loadPNS(sails, prefix) {
-        if (prefix == undefined)
+        if (!prefix)
             prefix = '';
         let functionBody = 'return sails' + prefix + '.devices';
 
@@ -90,32 +91,51 @@ class JCompiler {
 
         const target = this.target;
         const topKey = Object.keys(target);
-        if (topKey.indexOf('device') != -1) {
+        let extraTables=[];
+        if (topKey.indexOf('device') !== -1) {
             // add the device data models to function body
             rules = parser.loadConditions(target['device'], new Function('rules', 'return rules.config.isDevice'));
+            if (rules.general.inDeep) {
+                rules.inDeep = _.cloneDeep(rules.general.inDeep);
+                rules.inDeep.forEach(deep=>{
+                        extraTables.push(deep.maps[0]);
+                });
+                delete rules.general.inDeep;
+            }
             deviceFilter = function (obj) {
-                return (commons.validator.ruleDateValidator(obj, rules.dateTime));
+                return (commons.validator.ruleDateValidator(obj, rules.dateTime)) &&
+                    ( commons.validator.ruleInDeepValidator(obj,rules.inDeep));
             }
         }
-        if (topKey.indexOf('flight') != -1) {
+        if (topKey.indexOf('flight') !== -1) {
             flightFilter = function (obj) {
                 rules = parser.loadConditions(target['flight'], new Function('rules', 'return rules.config.isFlight'));
                 return generalCompare(obj, rules);
             }
         }
-        if (topKey.indexOf('booking') != -1) {
+        if (topKey.indexOf('booking') !== -1) {
             bookingFilter = function (obj) {
                 let rules = parser.loadConditions(target['booking'], new Function('rules', 'return rules.config.isBooking'));
                 return generalCompare(obj, rules);
             }
         }
+       /* extraTables=['Coaches'];
+        const that=this;
+        const extraInfo=Promise.all(extraTables.map(tableName=>{
+            return new Function('sails',`return sails${prefix}.${tableName.toLowerCase()}.find()`);
+        }).map(func=>{
+            return func.call(that,sails)
+        }));*/
+        ( new Function('sails',extraTables))
         return new Promise((resolve, reject) => {
             (new Function('sails', functionBody))
                 .call(this, sails)
                 .find({where: rules.general})
                 .populate(['anyFlights', 'anyBooking'])
+              /*  .then(extraInfo)*/
                 .then((devices) => {
-                    "use strict";
+                    // load extra tables
+                    // should load all other required tables.
                     const pns = devices.filter(device => {
                         let out;
                         if (!deviceFilter(device)) {
@@ -157,7 +177,7 @@ class JCompiler {
                             "use strict";
                             v.forEach(param => {
                                 if (p.filter(key => {
-                                        return key.name == param.name
+                                        return key.name === param.name
                                     }).length !== 1)
                                     p.push(param);
                             })

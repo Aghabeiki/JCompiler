@@ -84,7 +84,7 @@ class Parser {
                 let targets = {};
                 topKey.forEach(key => {
                     let tmpVerbKeys = Object.keys(rawTarget[key]);
-                    if (tmpVerbKeys.filter(commons.validator.isValidVerb).length != tmpVerbKeys.length) {
+                    if (tmpVerbKeys.filter(commons.validator.isValidVerb).length !== tmpVerbKeys.length) {
                         throw new Error('target ' + key + '  is not valid');
                     }
                     else {
@@ -111,13 +111,14 @@ class Parser {
     loadConditions(devicesRule, filter) {
         return {
             general: Handler.loadConditionsImplement(devicesRule, filter, false),
-            dateTime: Handler.loadConditionsImplement(devicesRule, filter, true)
+            dateTime: Handler.loadConditionsImplement(devicesRule, filter, true),
         }
     }
 
     loadConditionsImplement(devicesRule, filter, loadDateTime) {
         loadDateTime = loadDateTime || false;
         let outJSON = {};
+        let inDeep = [];
         Object.keys(devicesRule).map(key => {
             return {
                 value: devicesRule[key].keyTarget.valuePreProcessor(devicesRule[key].value),
@@ -130,20 +131,8 @@ class Parser {
             let res = false;
             Object.keys(rules.value).forEach(operand => {
                 res = res || (operands[operand].isDateTime || false)
-            })
-
-            if (loadDateTime == false && res == false) {
-                return true;
-            }
-            else if (loadDateTime == true && res == false) {
-                return false
-            }
-            else if ( loadDateTime == true && res==true){
-                return true;
-            }
-            else if ( loadDateTime==false && res== true){
-                return false;
-            }
+            });
+            return (!loadDateTime && !res) || (loadDateTime && res);
         }).forEach(rules => {
             if (!commons.validator.validRules(rules.value, rules.config.acceptableOperand)) {
                 throw new Error("operand is not valid  fieldName "
@@ -163,17 +152,32 @@ class Parser {
             //todo  implement, multi operands as or condition in select
             //       for example we have 2 operands in our value field,like 2 `eql` then it should
             //          implement as or statement in waterline
-            outJSON = Object.keys(rules.value).map(key => {
-                return operands[key].style(rules.config.maps[1], rules.value[key])
-            }).reduce((p, v) => {
-                Object.keys(v).forEach(key => {
-                    p[key] = v[key];
+            outJSON = Object
+                .keys(rules.value)
+                .reduce((list, rule) => {
+                    if (_.isObject(rules.value[rule]) && typeof rules.value[rule].target === 'string') {
+                        let deepRule = {maps: rules.config.maps};
+                        deepRule.rules = {};
+                        deepRule.rules[rule] = rules.value[rule].target;
+                        inDeep.push(deepRule);
+                    }
+                    else
+                        list.push(rule)
+                    return list;
+                }, [])
+                .map(key => {
+                    return operands[key].style(rules.config.maps[1], rules.value[key])
                 })
-                return p;
-            }, outJSON);
-
-
-        })
+                .reduce((p, v) => {
+                    Object.keys(v).forEach(key => {
+                        p[key] = v[key];
+                    })
+                    return p;
+                }, outJSON);
+        });
+        if (inDeep.length) {
+            outJSON.inDeep = inDeep;
+        }
         return outJSON;
     }
 }

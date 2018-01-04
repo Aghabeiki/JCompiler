@@ -18,6 +18,7 @@ module.exports = [
         device_type: 'IOS',
         device_os_version: '0',
         device_locale: 'en-us',
+        appengine_city:'kuala lumpur',
         anyFlights: {
             pnr: 'ABC1',
             airline_iata_code: 'DD',
@@ -70,6 +71,7 @@ module.exports = [
         device_type: 'android',
         device_os_version: '0',
         device_locale: 'en-us',
+        appengine_city:'mamad abad',
         anyFlights: {
             pnr: 'ABC2',
             airline_iata_code: 'DD',
@@ -122,6 +124,7 @@ module.exports = [
         device_type: 'android',
         device_os_version: '0',
         device_locale: 'en-us',
+        appengine_city:'hasan abad',
         anyFlights: {
             pnr: 'ABC',
             airline_iata_code: 'DD',
