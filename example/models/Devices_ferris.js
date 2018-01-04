@@ -6,24 +6,24 @@
  */
 
 module.exports = {
-    tableName: 'devices_ferris',
-    tables: ['devices', 'ferris'],
-    junctionTable: true,
-    attributes: {
-        id: {
-            type: 'integer',
-            // required: true,
-            autoIncrement: true,
-            primaryKey: true,
-            size: 11
-        },
-        device_id: {
-            columnName: 'device_id',
-            model: 'devices'
-        },
-        ferry_id: {
-            columnName: 'flight_id',
-            model: 'ferris'
-        }
-    }
+  tableName: 'devices_ferris',
+  tables: ['devices', 'ferris'],
+  junctionTable: true,
+  attributes: {
+    id: {
+      type: 'integer',
+      // required: true,
+      autoIncrement: true,
+      primaryKey: true,
+      size: 11,
+    },
+    device_id: {
+      columnName: 'device_id',
+      model: 'devices',
+    },
+    ferry_id: {
+      columnName: 'flight_id',
+      model: 'ferris',
+    },
+  },
 };

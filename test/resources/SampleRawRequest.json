@@ -33,7 +33,7 @@
     },
     "target-user": {
       "push_token": {
-        "eql":"something"
+        "eql": "something"
       },
       "email_address": "",
       "mobile_number": "",

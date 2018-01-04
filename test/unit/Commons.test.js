@@ -2,66 +2,74 @@
  * Created by roten on 8/14/17.
  */
 
-let should = require('should');
-const commons = require('../../src/lib/Commons').getInstance()
+'use strict';
 
-describe('check the commons library', function () {
-    describe('parser unit test', function () {
-        "use strict";
-        describe('getVerbsInString unit test', function () {
-            "use strict";
-            it('should detect splitter : ', function (done) {
-                let res=commons.parser.getVerbsInString('your Flight is:{*flight_number*}')
-                res.should.be.an.Array().with.lengthOf(1)
-                done()
-            })
-            it('should detect splitter ?',function () {
-                let res=commons.parser.getVerbsInString('your flight is {*flight_number*} ?{*firstname*}')
-                res.should.be.an.Array().with.lengthOf(2);
+const should = require('should');
+const commons = require('../../src/lib/Commons').getInstance();
 
-            })
-            it('should detect splitter ;',function () {
-                let res=commons.parser.getVerbsInString('your flight is {*flight_number*} ;{*firstname*}')
-                res.should.be.an.Array().with.lengthOf(2);
+describe('check the commons library', () => {
+  describe('parser unit test', () => {
+    describe('getVerbsInString unit test', () => {
+      it('should detect splitter : ', done => {
+        const res = commons.parser.getVerbsInString(
+            'your Flight is:{*flight_number*}');
 
-            })
-            it('should detect splitter .',function () {
-                let res=commons.parser.getVerbsInString('your flight is {*flight_number*}.')
-                res.should.be.an.Array().with.lengthOf(1);
+        res.should.be.an.Array().with.lengthOf(1);
+        done();
+      });
+      it('should detect splitter ?', () => {
+        const res = commons.parser.getVerbsInString(
+            'your flight is {*flight_number*} ?{*firstname*}');
 
-            })
-            it('should detect splitter !',function () {
-                let res=commons.parser.getVerbsInString('your flight is {*flight_number*} !{*firstname*}')
-                res.should.be.an.Array().with.lengthOf(2);
+        res.should.be.an.Array().with.lengthOf(2);
+      });
+      it('should detect splitter ;', () => {
+        const res = commons.parser.getVerbsInString(
+            'your flight is {*flight_number*} ;{*firstname*}');
 
-            })
-            it('should throw an Error because the verbs(var name) is not valid',function () {
-                let error=null;
-                try{
-                    commons.parser.getVerbsInString('this is not valid {*test_Amin*}')
-                }
-                catch (e){
-                    error=e;
-                }
-                should(error).be.ok()
-            })
-        })
-        describe('paramValidator unit test',function () {
-            "use strict";
-            it('should be pass',function () {
-                commons.validator.paramValidator({'inList':[]});
-            })
-            it('should be pass',function () {
-                commons.validator.paramValidator({'eql':'test'});
-            })
-            it('should be pass',function () {
-                commons.validator.paramValidator({'exList':[]});
-            })
-        })
-        describe('validRules unit test',function () {
-            it('should be okay',function () {
-                commons.validator.validRules({'eql':'test'},['eql']);
-            })
-        })
-    })
-})
+        res.should.be.an.Array().with.lengthOf(2);
+      });
+      it('should detect splitter .', () => {
+        const res = commons.parser.getVerbsInString(
+            'your flight is {*flight_number*}.');
+
+        res.should.be.an.Array().with.lengthOf(1);
+      });
+      it('should detect splitter !', () => {
+        const res = commons.parser.getVerbsInString(
+            'your flight is {*flight_number*} !{*firstname*}');
+
+        res.should.be.an.Array().with.lengthOf(2);
+      });
+      it('should throw an Error because the verbs(var name) is not valid',
+          () => {
+            let error = null;
+
+            try {
+              commons.parser.getVerbsInString(
+                  'this is not valid {*test_Amin*}');
+            }
+ catch (e) {
+              error = e;
+            }
+            should(error).be.ok();
+          });
+    });
+    describe('paramValidator unit test', () => {
+      it('should be pass', () => {
+        commons.validator.paramValidator({'inList': []});
+      });
+      it('should be pass', () => {
+        commons.validator.paramValidator({'eql': 'test'});
+      });
+      it('should be pass', () => {
+        commons.validator.paramValidator({'exList': []});
+      });
+    });
+    describe('validRules unit test', () => {
+      it('should be okay', () => {
+        commons.validator.validRules({'eql': 'test'}, ['eql']);
+      });
+    });
+  });
+});

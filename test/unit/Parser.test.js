@@ -1,104 +1,112 @@
 /**
  * Created by roten on 8/14/17.
  */
-let should = require('should');
-const parser = require('../../src/lib/Parser').getInstance()
-describe('should check parser work correctly', function () {
-    describe('RawContentParser unit test', function () {
-        it('should throw an Error because parser get an empty Object as input arguments', function (done) {
-            let error = null;
-            try {
-                parser.RawContentParser(null);
-            }
-            catch (e) {
-                error = e;
-            }
+'use strict';
 
-            should.exists(error, '`error` is not trowed');
-            done();
-        })
-        it('should throw an Error , if the language code is not correct', function (done) {
-            let err = null;
-            try {
-                let res = parser.RawContentParser({
-                    'test': {}
-                })
-            }
-            catch (e) {
-                err = e;
-            }
-            should.exists(err, '`error` is not trowed');
-            done()
-        })
-    })
+const should = require('should');
+const parser = require('../../src/lib/Parser').getInstance();
 
+describe('should check parser work correctly', () => {
+  describe('rawContentParser unit test', () => {
+    it(
+        'should throw an Error because parser get an empty Object as input arguments',
+        done => {
+          let error = null;
 
-    describe('RawTargetParser unit test', function () {
-        it('should throw Error because of empty targets', function () {
-            let err = null;
-            try {
-                parser.RawTargetParser()
-            }
-            catch (e) {
-                err = e;
-            }
-            should.exists(err, '`error` is not trowed');
-        })
-        it('should throw Error because of wrong `topKey` use in target', function () {
-            let err = null;
-            try {
-                parser.RawTargetParser({'amin': {}});
-            }
-            catch (e) {
-                err = e;
-            }
-            should.exists(err, '`error` is not trowed');
-        })
-        it('should throw Error becuse the wrong Verb under valid topKey', function () {
-            let err = null;
-            try {
-                parser.RawTargetParser({user: {'test-mamad': 1}})
-            }
-            catch (e) {
-                err = e;
-            }
-            should.exists(err, '`error` is not trowed');
-        })
-        it('should throw an error', function () {
-            "use strict";
-            let err = null;
-            try {
-                parser.RawTargetParser({
-                    user: {
-                        'failed test': 'okay'
-                    }
-                })
-            }
-            catch (e) {
-                err = e;
-            }
-            should.exists(err, '`error` is not trowed');
-        })
-        it('should throw an error', function () {
-            "use strict";
-            let err = null;
-            try {
-                parser.RawTargetParser({
-                    device: {
-                        'failed test': 'okay'
-                    }
-                })
-            }
-            catch (e) {
-                err = e;
-            }
-            should.exists(err, '`error` is not trowed');
-        })
+          try {
+            parser.rawContentParser(null);
+          }
+ catch (e) {
+            error = e;
+          }
 
-    })
+          should.exists(error, '`error` is not trowed');
+          done();
+        });
+    it('should throw an Error , if the language code is not correct',
+        done => {
+          let err = null;
 
+          try {
+            parser.rawContentParser({
+              'test': {},
+            });
+            done(new Error('not thrown an error.'));
+          }
+ catch (e) {
+            err = e;
+          }
+          should.exists(err, '`error` is not trowed');
+          done();
+        });
+  });
 
+  describe('rawTargetParser unit test', () => {
+    it('should throw Error because of empty targets', () => {
+      let err = null;
 
+      try {
+        parser.rawTargetParser();
+      }
+ catch (e) {
+        err = e;
+      }
+      should.exists(err, '`error` is not trowed');
+    });
+    it('should throw Error because of wrong `topKey` use in target',
+        () => {
+          let err = null;
 
-})
+          try {
+            parser.rawTargetParser({'amin': {}});
+          }
+ catch (e) {
+            err = e;
+          }
+          should.exists(err, '`error` is not trowed');
+        });
+    it('should throw Error becuse the wrong Verb under valid topKey',
+        () => {
+          let err = null;
+
+          try {
+            parser.rawTargetParser({user: {'test-mamad': 1}});
+          }
+ catch (e) {
+            err = e;
+          }
+          should.exists(err, '`error` is not trowed');
+        });
+    it('should throw an error', () => {
+      let err = null;
+
+      try {
+        parser.rawTargetParser({
+          user: {
+            'failed test': 'okay',
+          },
+        });
+      }
+ catch (e) {
+        err = e;
+      }
+      should.exists(err, '`error` is not trowed');
+    });
+    it('should throw an error', () => {
+      let err = null;
+
+      try {
+        parser.rawTargetParser({
+          device: {
+            'failed test': 'okay',
+          },
+        });
+      }
+ catch (e) {
+        err = e;
+      }
+      should.exists(err, '`error` is not trowed');
+    });
+  });
+});
 

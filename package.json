@@ -5,7 +5,8 @@
   "scripts": {
     "test": "nyc --reporter=text mocha  test/**/*.test.js",
     "gen-docs": "rm -rf docs && node_modules/jsdoc/jsdoc.js -r -c jsdoc.json src/** -d docs&&node_modules/opn-cli/cli.js docs/index.html",
-    "open-docs": "node_modules/opn-cli/cli.js docs/index.html "
+    "open-docs": "node_modules/opn-cli/cli.js docs/index.html ",
+    "eslint": "./node_modules/.bin/eslint  --ignore-pattern .gitignore ."
   },
   "author": "A.Aghabeiki",
   "license": "ISC",
@@ -14,6 +15,7 @@
     "bluebird": "^3.5.0",
     "docdash": "^0.4.0",
     "documentation": "^5.2.1",
+    "eslint-config-google": "^0.9.1",
     "jsdoc": "^3.5.4",
     "lodash": "^4.17.4",
     "mocha": "^3.5.0",
@@ -27,6 +29,7 @@
   },
   "dependencies": {
     "countryjs": "^1.8.0",
+    "eslint": "^4.14.0",
     "lcid": "^1.0.0",
     "moment": "^2.18.1",
     "tzwhere": "^1.0.0"
