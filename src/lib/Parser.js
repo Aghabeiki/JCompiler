@@ -1,6 +1,7 @@
 'use strict';
 
-const commons = require('./Commons').getInstance();
+const commons = require('./Commons').
+  getInstance();
 const operands = require('./operands');
 const _ = require('lodash');
 /**
@@ -30,7 +31,7 @@ class Parser {
     if (commons.validator.isEmpty(rawContent)) {
       throw new Error('content is missed or not valid');
     }
- else {
+    else {
       let isItClean = true;
       const keysArray = Object.keys(rawContent);
 
@@ -56,7 +57,7 @@ class Parser {
         if (!commons.validator.isEmpty(tmp.subtitle)) {
           // load var and validates from the string s
           parsedContent.subtitle = commons.parser.getVerbsInString(
-              tmp.subtitle);
+            tmp.subtitle);
         }
         if (!commons.validator.isEmpty(tmp.message)) {
           // load var and validates from the string s
@@ -65,7 +66,7 @@ class Parser {
 
         p[key] = parsedContent;
 
-return p;
+        return p;
       }, {});
     }
   }
@@ -79,52 +80,93 @@ return p;
     if (commons.validator.isEmpty(rawTarget, false)) {
       throw new Error('target(s) is(are) missed or not valid');
     }
- else {
+    else {
       const topKey = Object.keys(rawTarget);
 
       if (topKey.filter(commons.validator.topKeyValidator).length !==
-          topKey.length) {
+        topKey.length) {
         throw new Error('target(s) is(are) missed or not valid ' +
-            JSON.stringify(topKey));
+          JSON.stringify(topKey));
       }
- else {
+      else {
         const targets = {};
 
         topKey.forEach(key => {
           const tmpVerbKeys = Object.keys(rawTarget[key]);
 
           if (tmpVerbKeys.filter(commons.validator.isValidVerb).length !==
-              tmpVerbKeys.length) {
+            tmpVerbKeys.length) {
             throw new Error('target ' + key + '  is not valid');
           }
- else {
+          else {
             targets[key] = tmpVerbKeys.map(verbKey => ({
-                keyName: verbKey,
-                keyTarget: commons.commons.getVerbConfig(verbKey),
-                value: rawTarget[key][verbKey],
-              })).reduce((p, v) => {
-              p[v.keyName] = v;
+              keyName: verbKey,
+              keyTarget: commons.commons.getVerbConfig(verbKey),
+              value: rawTarget[key][verbKey],
+            })).
+              reduce((p, v) => {
+                p[v.keyName] = v;
 
-return p;
-            }, {});
+                return p;
+              }, {});
           }
         });
 
-return targets;
+        return targets;
       }
     }
   }
 
   /**
    *
-   * @param {json}devicesRule
-   * @param {function}filter
-   * @return {{general: {json}, dateTime: {json}}}
+   * @param {json} rules
+   * @param {function} filter
+   * @return {{general: {}, dateTime: {}, inDeep: {}}}
    */
-  loadConditions(devicesRule, filter) {
+  loadConditions(rules, filter) {
+    const generalAndDeep = Handler.loadConditionsImplement(rules, filter, false);
+    const dateTimeAndDeep = Handler.loadConditionsImplement(rules, filter, true);
+    // First load all in Deep  in inDeep param
+    const inDeepParts = {};
+    const requiredFields=[];
+
+    [generalAndDeep.inDeep || [], dateTimeAndDeep.inDeep || []].forEach(part => {
+      part.forEach(config => {
+        let head = null;
+
+        config.maps.forEach((key, index) => {
+          if (!index) {
+            if (!inDeepParts[key]) {
+              inDeepParts[key] = {};
+            }
+            head = inDeepParts[key];
+          }
+          else if ((index + 1) === config.maps.length) {
+            head[key] = Object.keys(config.rules).
+              reduce((p, v) => {
+                p[v] = commons.commons.getVerbConfig(config.rules[v]).maps;
+                requiredFields.push(commons.commons.getVerbConfig(config.rules[v]).maps);
+
+return p;
+              }, {});
+          }
+          else if (!head[key]) {
+            head[key] = {};
+          }
+        });
+      });
+    });
+
+    delete generalAndDeep.inDeep;
+    delete dateTimeAndDeep.inDeep;
+
     return {
-      general: Handler.loadConditionsImplement(devicesRule, filter, false),
-      dateTime: Handler.loadConditionsImplement(devicesRule, filter, true),
+      general: generalAndDeep,
+      dateTime: dateTimeAndDeep,
+      inDeep: {
+        rules: inDeepParts,
+        extraTables: requiredFields,
+      },
     };
   }
 
@@ -140,66 +182,75 @@ return targets;
     let outJSON = {};
     const inDeep = [];
 
-    Object.keys(devicesRule).map(key => ({
+    Object.keys(devicesRule).
+      map(key => ({
         value: devicesRule[key].keyTarget.valuePreProcessor(
-            devicesRule[key].value),
+          devicesRule[key].value),
         config: devicesRule[key].keyTarget,
         fieldName: key,
-      })).filter(rules => filter.call(this, rules)).filter(rules => {
-      let res = false;
+      })).
+      filter(rules => filter.call(this, rules)).
+      filter(rules => {
+        let res = false;
 
-      Object.keys(rules.value).forEach(operand => {
-        res = res || (operands[operand].isDateTime || false);
-      });
+        Object.keys(rules.value).
+          forEach(operand => {
+            res = res || (operands[operand].isDateTime || false);
+          });
 
-return (!loadDateTime && !res) || (loadDateTime && res);
-    }).forEach(rules => {
-      if (!commons.validator.validRules(rules.value,
-              rules.config.acceptableOperand)) {
-        throw new Error('operand is not valid  fieldName '
+        return (!loadDateTime && !res) || (loadDateTime && res);
+      }).
+      forEach(rules => {
+        if (!commons.validator.validRules(rules.value,
+            rules.config.acceptableOperand)) {
+          throw new Error('operand is not valid  fieldName '
             + rules.fieldName + ' acceptable operands : '
             + JSON.stringify(rules.config.acceptableOperand));
-      }
-      if (!commons.validator.paramValidator(rules.value)) {
-        throw new Error('the requested compare value(s) type is not correct. fieldName '
+        }
+        if (!commons.validator.paramValidator(rules.value)) {
+          throw new Error('the requested compare value(s) type is not correct. fieldName '
             + rules.config.maps[1] + ' acceptable operands : '
             + JSON.stringify(rules.config.acceptableOperand));
-      }
-      if (!commons.validator.filedNameMachs(rules)) {
-        throw new Error('the requested compare filedName(s) is not machs. fieldName '
+        }
+        if (!commons.validator.filedNameMachs(rules)) {
+          throw new Error('the requested compare filedName(s) is not machs. fieldName '
             + rules.config.maps[1] + ' acceptable operands : '
             + JSON.stringify(rules.config.acceptableOperand));
-      }
-      // todo  implement, multi operands as or condition in select
-      //       for example we have 2 operands in our value field,like 2 `eql` then it should
-      //          implement as or statement in waterline
-      outJSON = Object.keys(rules.value).reduce((list, rule) => {
-        if (_.isObject(rules.value[rule]) &&
-            typeof rules.value[rule].target === 'string') {
-          const deepRule = {maps: rules.config.maps};
-
-          deepRule.rules = {};
-          deepRule.rules[rule] = rules.value[rule].target;
-          inDeep.push(deepRule);
         }
- else {
-          list.push(rule);
-        }
+        // todo  implement, multi operands as or condition in select
+        //       for example we have 2 operands in our value field,like 2 `eql` then it should
+        //          implement as or statement in waterline
+        outJSON = Object.keys(rules.value).
+          reduce((list, rule) => {
+            if (_.isObject(rules.value[rule]) &&
+              typeof rules.value[rule].target === 'string') {
+              const deepRule = {maps: rules.config.maps};
 
-return list;
-      }, []).map(key => operands[key].style(rules.config.maps[1], rules.value[key])).reduce((p, v) => {
-        Object.keys(v).forEach(key => {
-          p[key] = v[key];
-        });
+              deepRule.rules = {};
+              deepRule.rules[rule] = rules.value[rule].target;
+              inDeep.push(deepRule);
+            }
+            else {
+              list.push(rule);
+            }
 
-return p;
-      }, outJSON);
-    });
+            return list;
+          }, []).
+          map(key => operands[key].style(rules.config.maps[1], rules.value[key])).
+          reduce((p, v) => {
+            Object.keys(v).
+              forEach(key => {
+                p[key] = v[key];
+              });
+
+            return p;
+          }, outJSON);
+      });
     if (inDeep.length) {
       outJSON.inDeep = inDeep;
     }
 
-return outJSON;
+    return outJSON;
   }
 }
 
@@ -220,7 +271,7 @@ module.exports = (function() {
         instance = createInstance();
       }
 
-return instance;
+      return instance;
     },
   };
 })();

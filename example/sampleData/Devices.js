@@ -116,7 +116,7 @@ module.exports = [
     passport_expiry: new Date('2017/08/25').toISOString(),
     language: 'EN',
     currency: 'RM',
-    city: 'kuala lumpur',
+    city: 'mamad abad',
     country: 'MY',
     is_member: true,
     flight_stats_notification: true,

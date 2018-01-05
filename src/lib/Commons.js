@@ -33,7 +33,8 @@ class Commons {
     String.prototype.replaceAll = function(search, replacement) {
       const target = this;
 
-return target.split(search).join(replacement);
+      return target.split(search).
+        join(replacement);
     };
     Date.prototype.unix = function() {
       return Number.parseInt(this.getTime() / 1000);
@@ -51,7 +52,8 @@ return target.split(search).join(replacement);
    * @return {string}
    */
   replaceAll(target, search, replacement) {
-    return target.split(search).join(replacement);
+    return target.split(search).
+      join(replacement);
   }
 
   /**
@@ -62,10 +64,12 @@ return target.split(search).join(replacement);
    * @return {boolean}
    */
   isEmpty(obj, checkEmptyObject) {
-    if (checkEmptyObject === undefined) checkEmptyObject = true;
+    if (checkEmptyObject === undefined) {
+      checkEmptyObject = true;
+    }
 
-return (obj === null || obj === '' || obj === undefined
-        || ( checkEmptyObject && !Object.keys(obj).length ));
+    return (obj === null || obj === '' || obj === undefined
+      || ( checkEmptyObject && !Object.keys(obj).length ));
   }
 
   /**
@@ -80,29 +84,34 @@ return (obj === null || obj === '' || obj === undefined
 
     try {
       const lcid = require('lcid');
-      const formattedLCID = Object.keys(lcid.all).reduce((p, v) => {
-        p[v.toUpperCase().replace('_', '-')] = lcid.all[v];
+      const formattedLCID = Object.keys(lcid.all).
+        reduce((p, v) => {
+          p[v.toUpperCase().
+            replace('_', '-')] = lcid.all[v];
 
-return p;
-      }, {});
+          return p;
+        }, {});
 
-      if (lang.split(';').reduce((p, v) => {
-            const tmp = v.split(',').filter(vv => vv.length !== 0);
+      if (lang.split(';').
+          reduce((p, v) => {
+            const tmp = v.split(',').
+              filter(vv => vv.length !== 0);
 
             tmp.forEach(vvv => {
               p.push(vvv.toUpperCase());
             });
 
             return p;
-          }, []).filter(lang => formattedLCID[lang] !== undefined).length === 0) {
+          }, []).
+          filter(lang => formattedLCID[lang] !== undefined).length === 0) {
         throw new Error();
       }
     }
- catch (e) {
+    catch (e) {
       output = false;
     }
 
-return output;
+    return output;
   }
 
   /**
@@ -131,7 +140,7 @@ return output;
         break;
     }
 
-return output;
+    return output;
   }
 
   /**
@@ -141,72 +150,81 @@ return output;
    */
   getVerbsInString(sentences) {
     // space splitter
-    const vars = sentences.split(' ').reduce((p, v) => {
-      // , splitter
-      if (v.split(',').length !== 1) {
-        v.split(',').forEach(parts => {
-          p.push(parts);
-        });
-      }
-      // ; splitter
-      else if (v.split(';').length !== 1) {
-        v.split(';').forEach(parts => {
-          p.push(parts);
-        });
-      }
-      // splitter
-      else if (v.split('.').length !== 1) {
-        v.split('.').forEach(parts => {
-          p.push(parts);
-        });
-      }
-      // ! splitter
-      else if (v.split('!').length !== 1) {
-        v.split('!').forEach(parts => {
-          p.push(parts);
-        });
-      }
-      // ? splitter
-      else if (v.split('?').length !== 1) {
-        v.split('?').forEach(parts => {
-          p.push(parts);
-        });
-      }
-      // : splitter
-      else if (v.split(':').length !== 1) {
-        v.split(':').forEach(parts => {
-          p.push(parts);
-        });
-      }
- else {
-        p.push(v);
-      }
+    const vars = sentences.split(' ').
+      reduce((p, v) => {
+        // , splitter
+        if (v.split(',').length !== 1) {
+          v.split(',').
+            forEach(parts => {
+              p.push(parts);
+            });
+        }
+        // ; splitter
+        else if (v.split(';').length !== 1) {
+          v.split(';').
+            forEach(parts => {
+              p.push(parts);
+            });
+        }
+        // splitter
+        else if (v.split('.').length !== 1) {
+          v.split('.').
+            forEach(parts => {
+              p.push(parts);
+            });
+        }
+        // ! splitter
+        else if (v.split('!').length !== 1) {
+          v.split('!').
+            forEach(parts => {
+              p.push(parts);
+            });
+        }
+        // ? splitter
+        else if (v.split('?').length !== 1) {
+          v.split('?').
+            forEach(parts => {
+              p.push(parts);
+            });
+        }
+        // : splitter
+        else if (v.split(':').length !== 1) {
+          v.split(':').
+            forEach(parts => {
+              p.push(parts);
+            });
+        }
+        else {
+          p.push(v);
+        }
 
-return p;
-    }, []).filter(parts => parts.match(/\{\*.*\*\}/g) !== null);
+        return p;
+      }, []).
+      filter(parts => parts.match(/\{\*.*\*\}/g) !== null);
 
     if (!vars.length) {
       return [];
     }
- else {
+    else {
       const filteredVars = vars.filter(part => {
         const tmp = part.replaceAll('*}', '').
-            replaceAll('{*', '').
-            toLowerCase();
+          replaceAll('{*', '').
+          toLowerCase();
 
         return Handler.isValidVerb(tmp);
       });
 
       if (!filteredVars.length) {
         throw new Error(' the var(s)' + JSON.stringify(vars) +
-            ' is(are) not in the verb list');
+          ' is(are) not in the verb list');
       }
- else {
+      else {
         return filteredVars.map(parts => {
           const tmp = Handler.replaceAll(Handler.replaceAll(parts, '*}', ''),
-              '{*', '').toLowerCase();
+            '{*', '').
+            toLowerCase();
 
-return {name: parts, target: verbs[tmp]};
+          return {name: parts, target: verbs[tmp]};
         });
       }
     }
@@ -230,9 +248,8 @@ return {name: parts, target: verbs[tmp]};
   validRules(value, acceptableOperands) {
     const requestedOperands = Object.keys(value);
 
-    return requestedOperands
-    .filter(requestedOperand => acceptableOperands.indexOf(requestedOperand) !== -1)
-      .length === requestedOperands.length;
+    return requestedOperands.filter(requestedOperand => acceptableOperands.indexOf(requestedOperand) !== -1).length ===
+      requestedOperands.length;
   }
 
   /**
@@ -243,62 +260,64 @@ return {name: parts, target: verbs[tmp]};
   paramValidator(values) {
     let res = false;
 
-    Object.keys(values).forEach(operandKey => {
-      let parts = false;
+    Object.keys(values).
+      forEach(operandKey => {
+        let parts = false;
 
-      if (operands[operandKey].isDateTime) {
-        // / in date time comparing we have complex query
-        // todo implement load value structure from operands config file.
-        if (operandKey.toLowerCase() !== 'today' &&
+        if (operands[operandKey].isDateTime) {
+          // / in date time comparing we have complex query
+          // todo implement load value structure from operands config file.
+          if (operandKey.toLowerCase() !== 'today' &&
             operands[operandKey].type.val === undefined
             && values[operandKey].val === undefined) {
-          res = parts || true;
-        }
-        if (operandKey.toLowerCase() === 'today') {
-          res = true;
-        }
-        // to handel equal exact date
-        else if (operandKey === 'equalExactDate' &&
+            res = parts || true;
+          }
+          if (operandKey.toLowerCase() === 'today') {
+            res = true;
+          }
+          // to handel equal exact date
+          else if (operandKey === 'equalExactDate' &&
             values[operandKey].specificDate) {
-          res = true;
-        }
- else {
-          const value = values[operandKey];
+            res = true;
+          }
+          else {
+            const value = values[operandKey];
 
-          res = parts || (typeof value.val === 'string' &&
+            res = parts || (typeof value.val === 'string' &&
               value.val.length !== 0 &&
               value.val.split(' ').length === 2 &&
               dateTypeVerbs.indexOf(value.val.split(' ')[1].toLowerCase()) !==
               -1);
+          }
         }
-      }
- else if (_.isObject(values[operandKey]) &&
+        else if (_.isObject(values[operandKey]) &&
           Object.keys(values[operandKey]).length === 1
           && values[operandKey].target &&
           typeof values[operandKey].target === 'string') {
-        // For compare two pair.
-        parts = this.isValidVerb(values[operandKey].target);
-        res = parts || res;
-      }
- else {
-        operands[operandKey].type.split('|').forEach(type => {
-          switch (type) {
-            case 'string':
-              parts = typeof values[operandKey] === 'string';
-              break;
-            case 'number':
-              parts = typeof values[operandKey] === 'number';
-              break;
-            case 'array':
-              parts = Array.isArray(values[operandKey]);
-              break;
-          }
+          // For compare two pair.
+          parts = this.isValidVerb(values[operandKey].target);
           res = parts || res;
-        });
-      }
-    });
+        }
+        else {
+          operands[operandKey].type.split('|').
+            forEach(type => {
+              switch (type) {
+                case 'string':
+                  parts = typeof values[operandKey] === 'string';
+                  break;
+                case 'number':
+                  parts = typeof values[operandKey] === 'number';
+                  break;
+                case 'array':
+                  parts = Array.isArray(values[operandKey]);
+                  break;
+              }
+              res = parts || res;
+            });
+        }
+      });
 
-return res;
+    return res;
   }
 
   /**
@@ -316,7 +335,7 @@ return res;
       res = res && exec(param[ruleKey], rule[ruleKey]);
     }
 
-return res;
+    return res;
   }
 
   /**
@@ -333,37 +352,38 @@ return res;
         // should check in list
         res = rule.indexOf(param) !== -1;
       }
- else if (typeof rule === 'string' || typeof rule === 'number') {
+      else if (typeof rule === 'string' || typeof rule === 'number') {
         res = param === rule;
       }
- else {
+      else {
         let andRes = true;
 
-        Object.keys(rule).forEach(operands => {
-          switch (operands) {
-            case '<':
-              andRes = andRes && ( param < rule['<']);
-              break;
-            case '>':
-              andRes = andRes && ( param > rule['>']);
-              break;
-            case '!': // not in list
-              if (Array.isArray(rule['!'])) {
-                // not in list
-                andRes = andRes &&
+        Object.keys(rule).
+          forEach(operands => {
+            switch (operands) {
+              case '<':
+                andRes = andRes && ( param < rule['<']);
+                break;
+              case '>':
+                andRes = andRes && ( param > rule['>']);
+                break;
+              case '!': // not in list
+                if (Array.isArray(rule['!'])) {
+                  // not in list
+                  andRes = andRes &&
                     !rule['!'].filter(val => val === param).length;
-              }
- else {
-                // not eql
-                andRes = andRes && param !== rule['!'];
-              }
-              break;
-          }
-        });
+                }
+                else {
+                  // not eql
+                  andRes = andRes && param !== rule['!'];
+                }
+                break;
+            }
+          });
         res = res || andRes;
       }
 
-return res;
+      return res;
     });
   }
 
@@ -376,7 +396,7 @@ return res;
   ruleDateValidator(params, rules) {
     const moment = require('moment');
 
-return Handler.ruleValidator(params, rules, (param, rule) => {
+    return Handler.ruleValidator(params, rules, (param, rule) => {
       const compareTools = function(andRes, operands) {
         const compareIt = function(a, b, operands) {
           let functionName = {
@@ -386,20 +406,20 @@ return Handler.ruleValidator(params, rules, (param, rule) => {
           };
 
           if (rule.compareOptions.yy && rule.compareOptions.mm &&
-              rule.compareOptions.dd && rule.compareOptions.h &&
-              rule.compareOptions.m && rule.compareOptions.s) {
+            rule.compareOptions.dd && rule.compareOptions.h &&
+            rule.compareOptions.m && rule.compareOptions.s) {
             return a[functionName[operands]](b);
           }
 
           const compare = function(a, b, op) {
             const fn = new Function('a', 'b', 'return a ' + op + 'b;');
 
-return fn.call({}, a, b);
+            return fn.call({}, a, b);
           };
           let out = true;
 
           if (!rule.compareOptions.yy &&
-              (rule.compareOptions.mm || rule.compareOptions.dd)) {
+            (rule.compareOptions.mm || rule.compareOptions.dd)) {
             if (rule.compareOptions.yy) {
               out = out && compare(a.year(), b.year(), operands);
             }
@@ -419,7 +439,7 @@ return fn.call({}, a, b);
               out = out && compare(a.seconds(), b.seconds(), operands);
             }
           }
- else {
+          else {
             functionName = functionName[operands];
             if (rule.compareOptions.yy) {
               out = out && a[functionName](b, 'years');
@@ -448,11 +468,14 @@ return fn.call({}, a, b);
           return false;
         }
 
-return andRes &&
-            compareIt(moment(param).utc(), rule[operands].utc(), operands);
+        return andRes &&
+          compareIt(moment(param).
+            utc(), rule[operands].utc(), operands);
       };
 
-return Object.keys(rule).filter(key => key !== 'compareOptions').reduce(compareTools, true);
+      return Object.keys(rule).
+        filter(key => key !== 'compareOptions').
+        reduce(compareTools, true);
     });
   }
 
@@ -516,7 +539,7 @@ module.exports = (function() {
         };
       }
 
-return instance;
+      return instance;
     },
   };
 })();

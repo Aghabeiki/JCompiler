@@ -51,7 +51,7 @@ const config = {
   },
 
   defaults: {
-    migrate: 'safe',
+    migrate: 'drop',
   },
 
 };
@@ -79,7 +79,7 @@ module.exports = function(cb) {
 const bootstrap = function(collections, cb) {
   'use strict';
   const data = require('./sampleData/Devices');
-  const coash=require('./sampleData/Coaches');
+  const city=require('./sampleData/city');
 
   async function orchestra() {
     let res=[];
@@ -87,8 +87,8 @@ const bootstrap = function(collections, cb) {
     try {
       res.push(await collections.devices.destroy());
       res.push(await collections.devices.create(data));
-      res.push(await collections.coaches.destroy());
-      res.push(await collections.coaches.create(coash));
+      res.push(await collections.citys.destroy())
+      res.push(await collections.citys.create(city));
     }
  catch (err) {
       res=err;

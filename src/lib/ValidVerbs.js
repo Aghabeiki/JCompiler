@@ -75,15 +75,17 @@ const verbList = [
       maps: ['devices', 'gender'],
       acceptableOperand: ['eql'],
       fieldName: 'gender',
-      valuePreProcessor: function(v) {
+      valuePreProcessor: v => {
         const newVal = {};
         const manWords = ['man', 'm', 'male', 'boy'];
 
-        Object.keys(v).forEach(key => {
-          newVal[key] = manWords.map(menWord => menWord.toLowerCase()).indexOf(v[key].val) != -1 ? 1 : 0;
-        });
+        Object.keys(v).
+          forEach(key => {
+            newVal[key] = manWords.map(menWord => menWord.toLowerCase()).
+              indexOf(v[key].val) != -1 ? 1 : 0;
+          });
 
-return newVal;
+        return newVal;
       },
     },
   },
@@ -106,9 +108,7 @@ return newVal;
       maps: ['devices', 'language'],
       acceptableOperand: ['eql', 'inList', 'exList'],
       fieldName: 'language',
-      valuePreProcessor: function(v) {
-        return v.toLowerCase();
-      },
+      valuePreProcessor: v => v.toLowerCase(),
     },
   },
   {
@@ -116,9 +116,7 @@ return newVal;
       maps: ['devices', 'currency'],
       acceptableOperand: ['eql', 'inList', 'exList'],
       fieldName: 'currency',
-      valuePreProcessor: function(v) {
-        return v.toLowerCase();
-      },
+      valuePreProcessor: v => v.toLowerCase(),
     },
   },
   {
@@ -140,15 +138,17 @@ return newVal;
       maps: ['devices', 'gender'],
       acceptableOperand: ['eql'],
       fieldName: 'gender',
-      valuePreProcessor: function(v) {
+      valuePreProcessor: v => {
         const newVal = {};
         const manWords = ['true', 'active'];
 
-        Object.keys(v).forEach(key => {
-          newVal[key] = manWords.map(menWord => menWord.toLowerCase()).indexOf(v[key]) != -1 ? 1 : 0;
-        });
+        Object.keys(v).
+          forEach(key => {
+            newVal[key] = manWords.map(menWord => menWord.toLowerCase()).
+              indexOf(v[key]) != -1 ? 1 : 0;
+          });
 
-return newVal;
+        return newVal;
       },
     },
   },
@@ -164,15 +164,17 @@ return newVal;
       maps: ['devices', 'gender'],
       acceptableOperand: ['eql'],
       fieldName: 'gender',
-      valuePreProcessor: function(v) {
+      valuePreProcessor: v => {
         const newVal = {};
         const manWords = ['true', 'active'];
 
-        Object.keys(v).forEach(key => {
-          newVal[key] = manWords.map(menWord => menWord.toLowerCase()).indexOf(v[key]) != -1 ? 1 : 0;
-        });
+        Object.keys(v).
+          forEach(key => {
+            newVal[key] = manWords.map(menWord => menWord.toLowerCase()).
+              indexOf(v[key]) !== -1 ? 1 : 0;
+          });
 
-return newVal;
+        return newVal;
       },
     },
   },
@@ -203,9 +205,7 @@ return newVal;
       maps: ['devices', 'device_locale'],
       acceptableOperand: ['eql', 'inList', 'exList'],
       fieldName: 'device_locale',
-      valuePreProcessor: function(v) {
-        return v.toLowerCase();
-      },
+      valuePreProcessor: v => v.toLowerCase(),
     },
   },
   {
@@ -337,7 +337,7 @@ return newVal;
     },
   };
 
-return p;
+  return p;
 }, {});
 
 module.exports = verbList;
