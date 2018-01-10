@@ -236,7 +236,7 @@ class Commons {
    * @return {JSON} verb config
    */
   getVerbConfig(verb) {
-    return verbs[verb];
+    return verbs[verb] || null;
   }
 
   /**

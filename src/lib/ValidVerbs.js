@@ -120,7 +120,7 @@ const verbList = [
     },
   },
   {
-    'city': {
+    'hometown': {
       maps: ['devices', 'city'],
       acceptableOperand: ['eql', 'inList', 'exList'],
       fieldName: 'city',
@@ -227,13 +227,22 @@ const verbList = [
 
       maps: ['flights', 'origin'],
       acceptableOperand: ['eql', 'inList', 'exList'],
+      fieldName: 'origin_airport',
+    },
+  },
+  {
+    'destination_airport_IATA_CODE': {
+
+      maps: ['flights', 'destination'],
+      acceptableOperand: ['eql', 'inList', 'exList'],
       fieldName: 'destination_airport',
     },
   },
   {
-    'destination_airport': {
-
-      maps: ['flights', 'destination'],
+    'destination_airport_city_name': {
+      maps: ['T_flights', 'F_destination',
+        'F_IATA_CODE', 'T_airports', 'F_city',
+        'F_id', 'T_citys', 'F_cityName'],
       acceptableOperand: ['eql', 'inList', 'exList'],
       fieldName: 'destination_airport',
     },
@@ -303,9 +312,9 @@ const verbList = [
     },
   },
   {
-    'live_location_city_name': {
+    'current_location_city_name': {
       maps: ['devices', 'appengine_city'],
-      acceptableOperand: ['eql', 'inList', 'exList'],
+      acceptableOperand: ['eql'],
       fieldName: 'appengine_city_under_device',
     },
   },
@@ -324,13 +333,33 @@ const verbList = [
     acceptableOperand: v[key].acceptableOperand || [],
     fieldName: key,
     get isDevice() {
-      return this.maps[0] === 'devices';
+      return this.maps[0] === 'devices' || this.maps[0].replace('T_', '')==='devices';
     },
     get isFlight() {
-      return this.maps[0] === 'flights';
+      return this.maps[0] === 'flights' || this.maps[0].replace('T_', '')==='flights';
     },
     get isBooking() {
-      return this.maps[0] === 'bookings';
+      return this.maps[0] === 'bookings' || this.maps[0].replace('T_', '')==='bookings';
+    },
+    isValidScope(scope) {
+      let res=false;
+
+      switch (scope.toLowerCase()) {
+        case 'device':
+          res=this.isDevice;
+          break;
+        case 'flight':
+          res=this.isFlight;
+          break;
+        case 'booking':
+          res=this.isBooking;
+          break;
+      }
+
+return res;
+    },
+    get shouldPreProcessed() {
+      return this.maps.length >2;
     },
     valuePreProcessor: v[key].valuePreProcessor || function(value) {
       return value;

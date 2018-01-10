@@ -10,7 +10,7 @@ module.exports = [
     passport_expiry: '2020/03/04',
     language: 'EN',
     currency: 'RM',
-    city: 'kuala lumpur',
+    city: 'Mashhad',
     country: 'MY',
     is_member: true,
     flight_stats_notification: true,

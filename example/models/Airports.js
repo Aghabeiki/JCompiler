@@ -14,6 +14,10 @@ module.exports = {
       primaryKey: true,
       size: 11
     },
+    IATA_CODE:{
+      type:'string',
+      required:true
+    },
     name: {
       type: 'string',
       required: true,

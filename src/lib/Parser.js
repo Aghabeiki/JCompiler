@@ -96,7 +96,11 @@ class Parser {
 
           if (tmpVerbKeys.filter(commons.validator.isValidVerb).length !==
             tmpVerbKeys.length) {
-            throw new Error('target ' + key + '  is not valid');
+            throw new Error(`target ${key} is not valid`);
+          }
+          else if (tmpVerbKeys.filter(verb=>commons.commons.getVerbConfig(verb).isValidScope(key)).length !==
+          tmpVerbKeys.length) {
+            throw new Error(`some used verbs are not belong to ${key} group.`);
           }
           else {
             targets[key] = tmpVerbKeys.map(verbKey => ({
@@ -121,52 +125,75 @@ class Parser {
    *
    * @param {json} rules
    * @param {function} filter
-   * @return {{general: {}, dateTime: {}, inDeep: {}}}
+   * @return {{
+      general: Object,
+      dateTime: Object,
+      inDeep: Object,
+      deepLink: Array,
+      extraTables: Array,
+
+    }}
    */
   loadConditions(rules, filter) {
     const generalAndDeep = Handler.loadConditionsImplement(rules, filter, false);
     const dateTimeAndDeep = Handler.loadConditionsImplement(rules, filter, true);
     // First load all in Deep  in inDeep param
     const inDeepParts = {};
-    const requiredFields=[];
+    const requiredFields = [];
+    const deepLinkParts=[]; // All the deep link verb will go to the inDeepParts.
 
-    [generalAndDeep.inDeep || [], dateTimeAndDeep.inDeep || []].forEach(part => {
-      part.forEach(config => {
-        let head = null;
+    [...(generalAndDeep.inDeep || []), ...(dateTimeAndDeep.inDeep || [])].forEach(config => {
+      let head = null;
 
-        config.maps.forEach((key, index) => {
-          if (!index) {
-            if (!inDeepParts[key]) {
-              inDeepParts[key] = {};
-            }
-            head = inDeepParts[key];
+      config.maps.forEach((key, index) => {
+        if (!index) {
+          if (!inDeepParts[key]) {
+            inDeepParts[key] = {};
           }
-          else if ((index + 1) === config.maps.length) {
-            head[key] = Object.keys(config.rules).
-              reduce((p, v) => {
-                p[v] = commons.commons.getVerbConfig(config.rules[v]).maps;
-                requiredFields.push(commons.commons.getVerbConfig(config.rules[v]).maps);
+          head = inDeepParts[key];
+        }
+        else if ((index + 1) === config.maps.length) {
+          head[key] = Object.keys(config.rules).
+            reduce((p, v) => {
+              p[v] = commons.commons.getVerbConfig(config.rules[v]).maps;
+              requiredFields.push(commons.commons.getVerbConfig(config.rules[v]).maps);
 
-return p;
-              }, {});
-          }
-          else if (!head[key]) {
-            head[key] = {};
-          }
-        });
+              return p;
+            }, {});
+        }
+        else if (!head[key]) {
+          head[key] = {};
+        }
       });
+    });
+    [...(generalAndDeep.deepLink||[]), ...(dateTimeAndDeep.deepLink||[])].forEach(rule=>{
+      if (deepLinkParts.indexOf(rule)===-1) {
+        deepLinkParts.push(rule);
+      }
+      if (rule.config.shouldPreProcessed&&requiredFields.indexOf(rule.config.maps) === -1) {
+        requiredFields.push(rule.config.maps);
+      }
+      else {
+        const [op]=Object.keys(rule.value);
+
+        if (rule.value[op].target.shouldPreProcessed &&requiredFields.indexOf(rule.value[op].target.maps) === -1) {
+          requiredFields.push(rule.value[op].target.maps);
+        }
+      }
     });
 
     delete generalAndDeep.inDeep;
     delete dateTimeAndDeep.inDeep;
+    delete generalAndDeep.deepLink;
+    delete dateTimeAndDeep.deepLink;
 
     return {
       general: generalAndDeep,
       dateTime: dateTimeAndDeep,
-      inDeep: {
-        rules: inDeepParts,
-        extraTables: requiredFields,
-      },
+      inDeep: inDeepParts || {},
+      deepLink: deepLinkParts || [],
+      extraTables: requiredFields || [],
+
     };
   }
 
@@ -179,8 +206,9 @@ return p;
    */
   loadConditionsImplement(devicesRule, filter, loadDateTime) {
     loadDateTime = loadDateTime || false;
-    let outJSON = {};
-    const inDeep = [];
+    let outJSON = {}; // Normal things.
+    const inDeep = []; // Collect all rules that link two verbs
+    const deepLink=[]; // Collect all verbs that need to join some tables.
 
     Object.keys(devicesRule).
       map(key => ({
@@ -200,7 +228,8 @@ return p;
 
         return (!loadDateTime && !res) || (loadDateTime && res);
       }).
-      forEach(rules => {
+      map(rules=>{
+        // validate rules
         if (!commons.validator.validRules(rules.value,
             rules.config.acceptableOperand)) {
           throw new Error('operand is not valid  fieldName '
@@ -217,6 +246,44 @@ return p;
             + rules.config.maps[1] + ' acceptable operands : '
             + JSON.stringify(rules.config.acceptableOperand));
         }
+
+        return rules;
+      }).
+      map(rule=>{
+        let shouldSkip=false;
+        // extract deepLink verbs
+        // check op1
+        // first level link
+
+        if (rule.config.shouldPreProcessed) {
+          deepLink.push(rule);
+          shouldSkip=true;
+        }
+
+        // check if the rule is inDeep checking mode
+        // should OP2 check for deepLink
+        const isInDeepRule=Object.keys(rule.value).reduce((p, v)=>{
+          if (_.isObject(rule.value[v]) && typeof rule.value[v].target==='string') {
+            const targetConfig=commons.commons.getVerbConfig(rule.value[v].target);
+
+            if (targetConfig && targetConfig.shouldPreProcessed) {
+              rule.value[v].target=targetConfig;
+              p=rule;
+            }
+          }
+
+          return p;
+        }, null);
+
+        if (isInDeepRule) {
+          deepLink.push(isInDeepRule);
+          shouldSkip=true;
+        }
+
+        return shouldSkip? undefined:rule;
+      }).
+      filter(rule=>rule).
+      forEach(rules => {
         // todo  implement, multi operands as or condition in select
         //       for example we have 2 operands in our value field,like 2 `eql` then it should
         //          implement as or statement in waterline
@@ -249,8 +316,25 @@ return p;
     if (inDeep.length) {
       outJSON.inDeep = inDeep;
     }
+    if (deepLink.length) {
+      outJSON.deepLink=deepLink;
+    }
 
     return outJSON;
+  }
+
+  /**
+   *
+   * @param {String} rules
+   * @param {Function} filter
+   */
+  loadPreProcessVerbs(rules, filter) {
+    Object.keys(rules).
+      filter(key => rules[key].keyTarget.shouldPreProcessed()).
+      filter(rules => filter.call(this, rules)).
+      forEach(key => {
+        console.log(key);// eslint-disable-line no-console
+      });
   }
 }
 

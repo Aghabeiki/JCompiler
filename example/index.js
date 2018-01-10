@@ -1,28 +1,74 @@
 const dataModel = require('./dataModelsLoader');
 const JCompiler = require('../index');
 
-// example for device join with bookings
-// all android devices that travel to bangkok
-// all android devices that travel to bangkok ,
 let jCompiler = null;
 
 try {
   jCompiler = new JCompiler({
-    device: {
-      live_location_city_name: {
-        eql: {
-          target: 'city',
-        },
-        // inList:['mamad abad']
-      },
-    },
-    /* 'device': {
-                passport_expiry: {
-                    equalExactDate: {
-                        specificDate:'2017-08-25 +08:00'
-                    }
-                }
-            }*/
+      device: {
+        current_location_city_name: {
+          eql: {
+            target: 'destination_airport_city_name'
+          }
+        }
+      }
+    /**
+     * @tutorial deepVerb normal rule.
+     *
+     *   flight:{
+     *     destination_airport_city_name:{
+     *       eql:'kuala lumpur'
+     *     }
+     *   }
+    }*/
+
+
+   /**
+    * @tutorial deepLink and deepVerbs rule
+    *
+    *  device:{
+    *    current_location_city_name:{
+    *      eql:{
+    *        target:"destination_airport_city_name"
+    *      }
+    *    }
+    *  }
+  */
+
+ /**
+  * @tutorial normal rules.
+  *  device:{
+  *    current_location_city_name:{
+  *      eql:"kuala lumpur"
+  *    },
+  *    hometown: {
+  *      eql:  "Mashhad"
+  *    }
+  *  }
+  */
+
+ /**
+  *  @tutorial deepLink rule
+  *   device: {
+  *      current_location_city_name: {
+  *      eql: {
+  *        target: 'hometown',
+  *      }
+  *    },
+  * },
+  *
+  * */
+
+   /**
+    * @tutorial special Date equalization. rule
+    * 'device': {
+    *            passport_expiry: {
+    *                equalExactDate: {
+    *                    specificDate:'2017-08-25 +08:00'
+    *                }
+    *            }
+    *        }
+    */
   },
   {
     'en-us':
