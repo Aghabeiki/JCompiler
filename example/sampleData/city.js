@@ -1,21 +1,21 @@
 module.exports = [
   {
-    cityName: 'kuala lumpur',
+    name: 'kuala lumpur',
     airports: [
-      { name: 'KLIA 1',IATA_CODE:'KUL' },
-      { name: 'KLIA 2' ,IATA_CODE:'KUL1'}
+      { name: 'KLIA 1',iata_code:'KUL' },
+      { name: 'KLIA 2' ,iata_code:'KKK'}
     ]
   },
   {
-    cityName: 'mamad abad',
+    name: 'mamad abad',
     airports: [
-      { name: 'mamd port',IATA_CODE:"IKA" }
+      { name: 'mamd port',iata_code:"IKA" }
     ]
   },
   {
-    cityName: 'hasan abad',
+    name: 'hasan abad',
     airports: [
-      { name: 'hasan port' ,IATA_CODE:'PKG'}
+      { name: 'hasan port' ,iata_code:'PKG'}
     ]
   }
 ];

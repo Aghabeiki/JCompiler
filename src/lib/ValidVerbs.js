@@ -241,8 +241,8 @@ const verbList = [
   {
     'destination_airport_city_name': {
       maps: ['T_flights', 'F_destination',
-        'F_IATA_CODE', 'T_airports', 'F_city',
-        'F_id', 'T_citys', 'F_cityName'],
+        'F_iata_code', 'T_airports', 'F_city',
+        'F_id', 'T_cities', 'F_name'],
       acceptableOperand: ['eql', 'inList', 'exList'],
       fieldName: 'destination_airport',
     },

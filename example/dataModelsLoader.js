@@ -87,8 +87,8 @@ const bootstrap = function(collections, cb) {
     try {
       res.push(await collections.devices.destroy());
       res.push(await collections.devices.create(data));
-      res.push(await collections.citys.destroy())
-      res.push(await collections.citys.create(city));
+      res.push(await collections.cities.destroy())
+      res.push(await collections.cities.create(city));
     }
  catch (err) {
       res=err;
@@ -99,9 +99,9 @@ return res;
   orchestra()
     .then(res=>{
       if (res instanceof Error) {
-        cb(res);
+        throw res;
       }
- else {
+      else {
         cb(null);
       }
     }).catch(cb);
