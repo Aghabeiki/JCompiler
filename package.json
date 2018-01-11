@@ -1,6 +1,6 @@
 {
   "name": "jerome-compiler",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "main": "index.js",
   "scripts": {
     "test": "nyc --reporter=text mocha  test/**/*.test.js",
@@ -8,31 +8,32 @@
     "open-docs": "node_modules/opn-cli/cli.js docs/index.html ",
     "eslint": "./node_modules/.bin/eslint  --ignore-pattern .gitignore ."
   },
+  "engines" : { "node" : ">=8.9.3" },
   "author": "A.Aghabeiki",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "bluebird": "^3.5.1",
-    "docdash": "^0.4.0",
-    "documentation": "^5.3.5",
-    "eslint-config-google": "^0.9.1",
-    "jsdoc": "^3.5.5",
-    "lodash": "^4.17.4",
-    "mocha": "^3.5.3",
-    "nyc": "^11.4.1",
-    "opn-cli": "^3.1.0",
-    "sails-disk": "^0.10.10",
-    "sails-memory": "^0.10.7",
-    "sails-mysql": "^0.11.5",
-    "should": "^11.2.1",
-    "tui-jsdoc-template": "^1.2.2",
-    "waterline": "^0.11.12"
+    "bluebird": "3.5.1",
+    "docdash": "0.4.0",
+    "documentation": "5.3.5",
+    "eslint-config-google": "0.9.1",
+    "jsdoc": "3.5.5",
+    "lodash": "4.17.4",
+    "mocha": "3.5.3",
+    "nyc": "11.4.1",
+    "opn-cli": "3.1.0",
+    "sails-disk": "0.10.10",
+    "sails-memory": "0.10.7",
+    "sails-mysql": "0.11.5",
+    "should": "11.2.1",
+    "tui-jsdoc-template": "1.2.2",
+    "waterline": "0.11.12"
   },
   "dependencies": {
-    "countryjs": "^1.8.0",
-    "eslint": "^4.14.0",
-    "lcid": "^1.0.0",
-    "moment": "^2.20.1",
-    "tzwhere": "^1.0.1"
+    "countryjs": "1.8.0",
+    "eslint": "4.14.0",
+    "lcid": "1.0.0",
+    "moment": "2.20.1",
+    "tzwhere": "1.0.1"
   }
 }

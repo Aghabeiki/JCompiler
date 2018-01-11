@@ -3,7 +3,7 @@
  */
 
 'use strict';
-
+module.exports = require('./src/JCompiler');
 module.exports = {
   JCompiler: require('./src/JCompiler'),
   ValidVerbs: require('./src/lib/ValidVerbs'),
@@ -32,5 +32,5 @@ module.exports = {
 return res;
   },
 };
-module.exports = require('./src/JCompiler');
+
 
