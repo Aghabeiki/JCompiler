@@ -138,46 +138,34 @@ class Parser {
     const generalAndDeep = Handler.loadConditionsImplement(rules, filter, false);
     const dateTimeAndDeep = Handler.loadConditionsImplement(rules, filter, true);
     // First load all in Deep  in inDeep param
-    const inDeepParts = {};
+    const inDeepParts = [];
     const requiredFields = [];
     const deepLinkParts=[]; // All the deep link verb will go to the inDeepParts.
+    /*
+     Check type of map and then add them to required filed.
+      */
+    const cleanMaps=map=>requiredFields.push(...(map.length>2 ?
+        map.filter(item=>item.startsWith('T_')).map(item=>item.replace('T_', '')): // It's a deep map.
+        [map[0]])); // It's a normal map.
 
     [...(generalAndDeep.inDeep || []), ...(dateTimeAndDeep.inDeep || [])].forEach(config => {
-      let head = null;
-
-      config.maps.forEach((key, index) => {
-        if (!index) {
-          if (!inDeepParts[key]) {
-            inDeepParts[key] = {};
-          }
-          head = inDeepParts[key];
-        }
-        else if ((index + 1) === config.maps.length) {
-          head[key] = Object.keys(config.rules).
-            reduce((p, v) => {
-              p[v] = commons.commons.getVerbConfig(config.rules[v]).maps;
-              requiredFields.push(commons.commons.getVerbConfig(config.rules[v]).maps);
-
-              return p;
-            }, {});
-        }
-        else if (!head[key]) {
-          head[key] = {};
-        }
-      });
+      inDeepParts.push(config);
+      cleanMaps(config.maps);
+      cleanMaps(Object.values(config.rules)[0]);
     });
+
     [...(generalAndDeep.deepLink||[]), ...(dateTimeAndDeep.deepLink||[])].forEach(rule=>{
       if (deepLinkParts.indexOf(rule)===-1) {
         deepLinkParts.push(rule);
       }
-      if (rule.config.shouldPreProcessed&&requiredFields.indexOf(rule.config.maps) === -1) {
-        requiredFields.push(rule.config.maps);
+      if (rule.config.shouldPreProcessed) {
+        cleanMaps(rule.config.maps);
       }
       else {
         const [op]=Object.keys(rule.value);
 
-        if (rule.value[op].target.shouldPreProcessed &&requiredFields.indexOf(rule.value[op].target.maps) === -1) {
-          requiredFields.push(rule.value[op].target.maps);
+        if (rule.value[op].target.shouldPreProcessed) {
+          cleanMaps(rule.value[op].target.maps);
         }
       }
     });
@@ -267,8 +255,10 @@ class Parser {
             const targetConfig=commons.commons.getVerbConfig(rule.value[v].target);
 
             if (targetConfig && targetConfig.shouldPreProcessed) {
-              rule.value[v].target=targetConfig;
-              p=rule;
+              const clonedRule=_.cloneDeep(rule);
+
+              clonedRule.value[v].target=targetConfig;
+              p=clonedRule;
             }
           }
 
@@ -290,11 +280,12 @@ class Parser {
         outJSON = Object.keys(rules.value).
           reduce((list, rule) => {
             if (_.isObject(rules.value[rule]) &&
-              typeof rules.value[rule].target === 'string') {
+              typeof rules.value[rule].target === 'string'&&
+              commons.validator.isValidVerb(rules.value[rule].target)) {
               const deepRule = {maps: rules.config.maps};
 
               deepRule.rules = {};
-              deepRule.rules[rule] = rules.value[rule].target;
+              deepRule.rules[rule] = commons.commons.getVerbConfig(rules.value[rule].target).maps;
               inDeep.push(deepRule);
             }
             else {
@@ -313,6 +304,7 @@ class Parser {
             return p;
           }, outJSON);
       });
+
     if (inDeep.length) {
       outJSON.inDeep = inDeep;
     }

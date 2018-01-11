@@ -63,7 +63,7 @@ module.exports = [
     passport_expiry: '2020/03/04',
     language: 'EN',
     currency: 'RM',
-    city: 'kuala lumpur',
+    city: 'hasan abad',
     country: 'IR',
     is_member: true,
     flight_stats_notification: true,
@@ -124,7 +124,7 @@ module.exports = [
     device_type: 'android',
     device_os_version: '0',
     device_locale: 'en-us',
-    appengine_city: 'hasan abad',
+    appengine_city: 'mamad abad',
     anyFlights: {
       pnr: 'ABC',
       airline_iata_code: 'DD',

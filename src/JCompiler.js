@@ -84,18 +84,21 @@ const logicalConfirmDeepMap=(val1, val2, op, mapper)=>{
   }
 
   let res=false;
-  const mappedVal2=Array.isArray(val2)? val2.map(key=>mapper[key]): mapper[val2];
+  const mappedVal2=mapper?Array.isArray(val2)? val2.map(key=>mapper[key]): mapper[val2]:null;
 
   switch (op) {
     case 'eql':
-      if (Array.isArray(val1) && Array.isArray(mappedVal2)) {
+      if (mapper && Array.isArray(val1) && Array.isArray(mappedVal2)) {
         res = val1.some(key=>mappedVal2.indexOf(key)!==-1);
       }
-      else if (Array.isArray(val1) && !Array.isArray(mappedVal2)) {
+      else if (mapper && Array.isArray(val1) && !Array.isArray(mappedVal2)) {
         res = val1.some(key=>key===mappedVal2);
       }
-      else if (!Array.isArray(val1) && Array.isArray(mappedVal2)) {
+      else if (mapper && !Array.isArray(val1) && Array.isArray(mappedVal2)) {
         res = mappedVal2.some(key=> key===val1);
+      }
+      else if (!mapper) {
+        res= val1===val2;
       }
       else {
         res = mappedVal2 === val1;
@@ -135,24 +138,7 @@ const selectOperands = (operands, values) => {
 
   return rule;
 };
-/**
- *
- * @param {Object} rule
- * @param {Object} extraInfo
- * @return {{}}
- */
-const ruleMapper = (rule, extraInfo) => {
-  const extractFromTableInfoValue = (route, lists) => [
-    ...lists.reduce((p, v) => {
-      p.add(v[route]);
 
-      return p;
-    }, new Set())];
-  const operands = Object.keys(rule)[0];// We accept only one operands.
-  const values = extractFromTableInfoValue(rule[operands][1], extraInfo[rule[operands][0]]);
-
-  return selectOperands(operands, values);
-};
 const generalCompare = (obj, rules) => (commons.validator.ruleGeneralValidator(obj, rules.general) &&
   commons.validator.ruleDateValidator(obj, rules.dateTime));
 let Handler = null;
@@ -233,7 +219,7 @@ class JCompiler {
     const topKey = Object.keys(target);
     const inDeepRules = [];
     const deepLinkPreprocessor = [];
-    const extraTables = [];
+    const extraTables = new Set();
 
     flightFilter = bookingFilter = deviceFilter = emptyRule;
 
@@ -242,10 +228,10 @@ class JCompiler {
       deviceRules = parser.loadConditions(target['device'],
         new Function('rules', 'return rules.config.isDevice'));
       if (Object.keys(deviceRules.inDeep).length) {
-        inDeepRules.push(deviceRules.inDeep);
+        inDeepRules.push(...deviceRules.inDeep);
       }
       if (deviceRules.extraTables.length) {
-        extraTables.push(...deviceRules.extraTables);
+        deviceRules.extraTables.forEach(item=>extraTables.add(item));
       }
       if (Object.keys(deviceRules.deepLink).length) {
         deepLinkPreprocessor.push(...deviceRules.deepLink);
@@ -255,10 +241,10 @@ class JCompiler {
       flightRules = parser.loadConditions(target['flight'],
         new Function('rules', 'return rules.config.isFlight'));
       if (Object.keys(flightRules.inDeep).length) {
-        inDeepRules.push(flightRules.inDeep);
+        inDeepRules.push(...flightRules.inDeep);
       }
       if (flightRules.extraTables.length) {
-        extraTables.push(...flightRules.extraTables);
+        flightRules.extraTables.forEach(item=>extraTables.add(item));
       }
       if (Object.keys(flightRules.deepLink).length) {
         deepLinkPreprocessor.push(...flightRules.deepLink);
@@ -268,38 +254,21 @@ class JCompiler {
       bookingRules = parser.loadConditions(target['booking'],
         new Function('rules', 'return rules.config.isBooking'));
       if (Object.keys(bookingRules.inDeep).length) {
-        inDeepRules.push(bookingRules.inDeep);
+        inDeepRules.push(...bookingRules.inDeep);
       }
       if (bookingRules.extraTables.length) {
-        extraTables.push(...bookingRules.extraTables);
+        bookingRules.extraTables.forEach(item=>extraTables.add(item));
       }
       if (Object.keys(bookingRules.deepLink).length) {
         deepLinkPreprocessor.push(...bookingRules.deepLink);
       }
     }
-
     const that = this;
     const orchestra = async () => {
       let res = [];
 
       try {
-        /* If map have 2 parts , it mean we have normal verbs
-           * in the normal verbs, the first part is the table.
-           * if the map have more then 2 parts, it mean we have to deep link verbs
-           * so need more process.
-           */
-        const normalVerbs = extraTables.filter(tables => tables.length === 2).
-          map(tables => tables[0]);
-
-        extraTables.filter(tables => tables.length > 2).
-          reduce((p, v) => {
-            v.forEach(item => {
-              if (item.startsWith('T_') && p.indexOf(item.replace('T_', '')) === -1) {
-                p.push(item.replace('T_', ''));
-              }
-            });
-          }, normalVerbs);
-
+        const normalVerbs = Array.from(extraTables);
         const extraInfo = (await Promise.all(normalVerbs.map(
           tableName => new Function('sails', `return sails${prefix}.${tableName.toLowerCase()}`).call(that, sails).
             find()
@@ -308,37 +277,6 @@ class JCompiler {
 
           return p;
         }, {});
-
-        // Alter the rules.
-
-        inDeepRules.forEach(rules => {
-          Object.keys(rules).
-            forEach(mainGroup => {
-              switch (mainGroup) {
-                case 'devices':
-                  Object.keys(rules[mainGroup]).
-                    forEach(filed => {
-                      deviceRules.general[filed] = ruleMapper(rules[mainGroup][filed], extraInfo);
-                    });
-
-                  break;
-                case 'flights':
-                  Object.keys(rules[mainGroup]).
-                    forEach(filed => {
-                      flightRules.general[filed] = ruleMapper(rules[mainGroup][filed], extraInfo);
-                    });
-
-                  break;
-                case 'bookings':
-                  Object.keys(rules[mainGroup]).
-                    forEach(filed => {
-                      bookingRules.general[filed] = ruleMapper(rules[mainGroup][filed], extraInfo);
-                    });
-
-                  break;
-              }
-            });
-        });
 
         // update the rules.
 
@@ -527,6 +465,15 @@ class JCompiler {
           }
         });// End of deep link processing.
 
+        inDeepRules.forEach(rule=>{
+          PNSs=PNSs.filter(pns=>{
+            const currentOP1Value=extractValue(rule.maps[0], rule.maps[1], pns);
+            const operand=Object.keys(rule.rules)[0];
+            const currentOP2Value=extractValue(rule.rules[operand][0], rule.rules[operand][1], pns);
+
+return logicalConfirmDeepMap(currentOP1Value, currentOP2Value, operand);
+          });
+        });
         res = PNSs.map(PNS => {
           const tmp = {};
 

@@ -5,6 +5,7 @@ let jCompiler = null;
 
 try {
   jCompiler = new JCompiler({
+
       device: {
         current_location_city_name: {
           eql: {
