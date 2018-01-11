@@ -490,12 +490,95 @@ class Commons {
   }
 
   /**
+   * @desc check the passed String param contain a date value.
+   * @param {String}target
+   * @return {boolean}
+   */
+  isValidDate(target) {
+    const d = new Date(target);
+
+    if (Object.prototype.toString.call(d) === '[object Date]') {
+      // it is a date
+      if (isNaN(d.getTime())) { // d.valueOf() could also work
+        // date is not valid
+        return false;
+      }
+      else {
+        // date is valid
+        return true;
+      }
+    }
+    else {
+      // not a date
+      return false;
+    }
+  }
+
+  /**
    *
    * @param {{fieldName:string,config:{fieldName:string}}} rules
    * @return {boolean}
    */
   filedNameMachs(rules) {
     return rules.fieldName === rules.config.fieldName;
+  }
+
+  /**
+   * @desc Returns an array with arrays of the given size.
+   *
+   * @param {Array} myArray  Array to split
+   * @param {Integer} chunkSize  Size of every group
+   * @return {[Array]}
+   */
+   chunkArray(myArray, chunkSize) {
+    const results = [];
+
+    while (myArray.length) {
+      results.push(myArray.splice(0, chunkSize));
+    }
+
+    return results;
+  }
+
+  /**
+   * @desc Rune the logical operand on the val1 and val2 for deep linking
+   * @param {T|Array} val1 The first value.
+   * @param {T|Array} val2 The second value.
+   * @param {String} op The operand for compare.
+   * @param {Object} mapper the map guide for map first val to second  val;
+   * @return {Boolean}
+   */
+   logicalConfirmDeepMap(val1, val2, op, mapper) {
+    if (!val1 || !val2 ) {
+      // If any of val is null return false.
+
+      return false;
+    }
+
+    let res=false;
+    const mappedVal2=mapper?Array.isArray(val2)? val2.map(key=>mapper[key]): mapper[val2]:null;
+
+    switch (op) {
+      case 'eql':
+        if (mapper && Array.isArray(val1) && Array.isArray(mappedVal2)) {
+          res = val1.some(key=>mappedVal2.indexOf(key)!==-1);
+        }
+        else if (mapper && Array.isArray(val1) && !Array.isArray(mappedVal2)) {
+          res = val1.some(key=>key===mappedVal2);
+        }
+        else if (mapper && !Array.isArray(val1) && Array.isArray(mappedVal2)) {
+          res = mappedVal2.some(key=> key===val1);
+        }
+        else if (!mapper) {
+          res= val1===val2;
+        }
+        else {
+          res = mappedVal2 === val1;
+        }
+        break;
+    }
+
+    return res;
   }
 }
 
@@ -519,6 +602,7 @@ module.exports = (function() {
           commons: {
             replaceAll: tmp.replaceAll,
             getVerbConfig: tmp.getVerbConfig,
+            chunkArray: tmp.chunkArray,
           },
           validator: {
             isEmpty: tmp.isEmpty,
@@ -531,6 +615,8 @@ module.exports = (function() {
             ruleDateValidator: tmp.ruleDateValidator,
             ruleInDeepValidator: tmp.ruleInDeepValidator,
             filedNameMachs: tmp.filedNameMachs,
+            isValidDate: tmp.isValidDate,
+            logicalConfirmDeepMap: tmp.logicalConfirmDeepMap,
           },
           parser: {
             getVerbsInString: tmp.getVerbsInString,

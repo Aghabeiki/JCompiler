@@ -328,6 +328,32 @@ class Parser {
         console.log(key);// eslint-disable-line no-console
       });
   }
+
+  /**
+   *
+   * @desc extract value of a table ,filed from the row data from DB.
+   * @param {String} table Table name.
+   * @param {String} field Filed name.
+   * @param {Object} rootObject
+   * @return {T}  An array or String,Number,Boolean or date or Object
+   */
+    extractValue(table, field, rootObject) {
+    let currentVal = null;
+
+    switch (table) {
+      case 'devices':
+        currentVal = rootObject[field];
+        break;
+      case 'flights':
+        currentVal = rootObject.anyFlights.map(flight => flight[field]);
+        break;
+      case 'bookings':
+        currentVal = rootObject.anyBooking.map(booking => booking[field]);
+        break;
+    }
+
+    return currentVal;
+  }
 }
 
 module.exports = (function() {

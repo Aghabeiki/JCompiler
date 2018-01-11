@@ -9,105 +9,6 @@ const parser = require('./lib/Parser').
   getInstance();
 const commons = require('./lib/Commons').
   getInstance();
-const isValidDate = function(target) {
-  const d = new Date(target);
-
-  if (Object.prototype.toString.call(d) === '[object Date]') {
-    // it is a date
-    if (isNaN(d.getTime())) { // d.valueOf() could also work
-      // date is not valid
-      return false;
-    }
-    else {
-      // date is valid
-      return true;
-    }
-  }
-  else {
-    // not a date
-    return false;
-  }
-};
-/**
- * Returns an array with arrays of the given size.
- *
- * @param {Array} myArray  Array to split
- * @param {Integer} chunkSize  Size of every group
- * @return {[Array]}
- */
-const chunkArray = (myArray, chunkSize) => {
-  const results = [];
-
-  while (myArray.length) {
-    results.push(myArray.splice(0, chunkSize));
-  }
-
-  return results;
-};
-/**
- *
- * @param {String} table Table name.
- * @param {String} field Filed name.
- * @param {Object} rootObject
- * @return {T}  An array or String,Number,Boolean or date or Object
- */
-const extractValue = (table, field, rootObject) => {
-  let currentVal = null;
-
-  switch (table) {
-    case 'devices':
-      currentVal = rootObject[field];
-      break;
-    case 'flights':
-      currentVal = rootObject.anyFlights.map(flight => flight[field]);
-      break;
-    case 'bookings':
-      currentVal = rootObject.anyBooking.map(booking => booking[field]);
-      break;
-  }
-
-  return currentVal;
-};
-/**
- *
- * @param {T|Array} val1 The first value.
- * @param {T|Array} val2 The second value.
- * @param {String} op The operand for compare.
- * @param {Object} mapper the map guide for map first val to second  val;
- * @return {Boolean}
- */
-const logicalConfirmDeepMap=(val1, val2, op, mapper)=>{
-  if (!val1 || !val2 ) {
-    // If any of val is null return false.
-
-    return false;
-  }
-
-  let res=false;
-  const mappedVal2=mapper?Array.isArray(val2)? val2.map(key=>mapper[key]): mapper[val2]:null;
-
-  switch (op) {
-    case 'eql':
-      if (mapper && Array.isArray(val1) && Array.isArray(mappedVal2)) {
-        res = val1.some(key=>mappedVal2.indexOf(key)!==-1);
-      }
-      else if (mapper && Array.isArray(val1) && !Array.isArray(mappedVal2)) {
-        res = val1.some(key=>key===mappedVal2);
-      }
-      else if (mapper && !Array.isArray(val1) && Array.isArray(mappedVal2)) {
-        res = mappedVal2.some(key=> key===val1);
-      }
-      else if (!mapper) {
-        res= val1===val2;
-      }
-      else {
-        res = mappedVal2 === val1;
-      }
-      break;
-  }
-
-  return res;
-};
 
 /**
  *
@@ -231,7 +132,7 @@ class JCompiler {
         inDeepRules.push(...deviceRules.inDeep);
       }
       if (deviceRules.extraTables.length) {
-        deviceRules.extraTables.forEach(item=>extraTables.add(item));
+        deviceRules.extraTables.forEach(item => extraTables.add(item));
       }
       if (Object.keys(deviceRules.deepLink).length) {
         deepLinkPreprocessor.push(...deviceRules.deepLink);
@@ -244,7 +145,7 @@ class JCompiler {
         inDeepRules.push(...flightRules.inDeep);
       }
       if (flightRules.extraTables.length) {
-        flightRules.extraTables.forEach(item=>extraTables.add(item));
+        flightRules.extraTables.forEach(item => extraTables.add(item));
       }
       if (Object.keys(flightRules.deepLink).length) {
         deepLinkPreprocessor.push(...flightRules.deepLink);
@@ -257,7 +158,7 @@ class JCompiler {
         inDeepRules.push(...bookingRules.inDeep);
       }
       if (bookingRules.extraTables.length) {
-        bookingRules.extraTables.forEach(item=>extraTables.add(item));
+        bookingRules.extraTables.forEach(item => extraTables.add(item));
       }
       if (Object.keys(bookingRules.deepLink).length) {
         deepLinkPreprocessor.push(...bookingRules.deepLink);
@@ -343,7 +244,7 @@ class JCompiler {
               targetFiled: filed.replace('F_', ''),
               map: {},
             };
-            chunkArray(join, 3).
+            commons.commons.chunkArray(join, 3).
               forEach((parts, index) => {
                 const [destinationField, table, field] = parts;
 
@@ -379,7 +280,7 @@ class JCompiler {
             let secondParts = selectOperands(operand, OP2Value);
             const [targetTable, baseFiled, ...joinedTables] = rules.config.maps;
 
-            chunkArray(joinedTables, 3).
+            commons.commons.chunkArray(joinedTables, 3).
               reverse().
               reduce((p, v) => {
                 const [destinationField, table, searchField] = v.
@@ -455,23 +356,23 @@ class JCompiler {
           }// End of OP1 deep processing.
           else { // OP2 processing
             const filter = (pns => {
-              const currentOp1Value=extractValue(op1.maps[0], op1.maps[1], pns);
-              const currentOp2Value=extractValue(OP2Value.targetTable, OP2Value.targetFiled, pns);
+              const currentOp1Value = parser.extractValue(op1.maps[0], op1.maps[1], pns);
+              const currentOp2Value = parser.extractValue(OP2Value.targetTable, OP2Value.targetFiled, pns);
 
-              return logicalConfirmDeepMap(currentOp1Value, currentOp2Value, operand, OP2Value.map);
+              return commons.validator.logicalConfirmDeepMap(currentOp1Value, currentOp2Value, operand, OP2Value.map);
             });
 
             PNSs = PNSs.filter(filter);
           }
         });// End of deep link processing.
 
-        inDeepRules.forEach(rule=>{
-          PNSs=PNSs.filter(pns=>{
-            const currentOP1Value=extractValue(rule.maps[0], rule.maps[1], pns);
-            const operand=Object.keys(rule.rules)[0];
-            const currentOP2Value=extractValue(rule.rules[operand][0], rule.rules[operand][1], pns);
+        inDeepRules.forEach(rule => {
+          PNSs = PNSs.filter(pns => {
+            const currentOP1Value = parser.extractValue(rule.maps[0], rule.maps[1], pns);
+            const operand = Object.keys(rule.rules)[0];
+            const currentOP2Value = parser.extractValue(rule.rules[operand][0], rule.rules[operand][1], pns);
 
-return logicalConfirmDeepMap(currentOP1Value, currentOP2Value, operand);
+            return commons.validator.logicalConfirmDeepMap(currentOP1Value, currentOP2Value, operand);
           });
         });
         res = PNSs.map(PNS => {
@@ -511,7 +412,7 @@ return logicalConfirmDeepMap(currentOP1Value, currentOP2Value, operand);
                 case 'devices':
                   val = PNS[param.target.maps[1]];
                   try {
-                    if (val !== undefined && val !== null && isValidDate(val)) {
+                    if (val !== undefined && val !== null && commons.validator.isValidDate(val)) {
                       tz.timezones(PNS.country);
 
                       if (PNS.latitude !== null && PNS.latitude !== undefined) {
