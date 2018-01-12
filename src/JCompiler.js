@@ -9,6 +9,7 @@ const parser = require('./lib/Parser').
   getInstance();
 const commons = require('./lib/Commons').
   getInstance();
+const ResultCalculator=require('./lib/ResultCalculator');
 
 /**
  *
@@ -268,7 +269,81 @@ class JCompiler {
             OP2Value = op2;
           }
 
-          if (op1.shouldPreProcessed) {
+          if (op1.calcRequired) {
+            //
+            const calcParam=(guideMap, pns)=>{
+              const postProcess=guideMap.filter(item=>item.startsWith('POST_'));
+              const [table, filed, resultsMode, ...otherCondition]=guideMap.
+                filter(item=>!item.startsWith('POST_')).
+                map(item=>item.replace('T_', '').replace('F_', '').replace('C_', ''));
+              const baseTable=table==='bookings'?pns.anyBooking : table==='flights'? pns.anyFlights :[];
+              const filedData=baseTable.map(item=>item[filed]);
+              const resultCalculator=new ResultCalculator(resultsMode);
+
+              filedData.forEach(value=>{
+                let res=false;
+
+                if (!otherCondition.length) {
+                  res=true;
+                }
+                else {
+                // It's messy code , if u need fix it.
+                  const [cmd, ...params]=otherCondition[0].replace('C_', '').split('_');
+
+                  if (cmd==='last') {
+                    res=(momentJS().add(params[0], params[1]).isAfter(momentJS(value)));
+                  }
+                }
+
+                resultCalculator.collectConditionResults(res, value);
+              });
+              let res=resultCalculator.Results;
+
+              if (postProcess.length) {
+                // just accept first post process;
+                /**
+                 * messy code is here !
+                 * its just hard coded unfortunately.
+                 *
+                 */
+                if (postProcess[0]==='POST_avrage_per_month') {
+                  // get first date,
+                  // get last date
+                  // calc how many month available.
+                  // calculate the avrage.
+                  const first=_.min(filedData.map(item=>new Date(item)));
+                  const last=_.max(filedData.map(item=>new Date(item)));
+                  const months=momentJS(last).diff(momentJS(first), 'months', true)+1;
+
+                  if (months) {
+res=res/months;
+}
+                }
+              }
+
+              return res;
+            };
+
+            PNSs=PNSs.filter(pns=>{
+              let res=false;
+              const calculatedOp1Value=calcParam(op1.maps, pns);
+
+              switch (operand) {
+                case 'eql':
+                  res= calculatedOp1Value == OP2Value;
+                  break;
+                case 'greaterThan':
+                  res= calculatedOp1Value >= OP2Value;
+                  break;
+                case 'lessThan':
+                  res = calculatedOp1Value <= OP2Value;
+                  break;
+              }
+
+              return res;
+            });
+          }
+          else if (op1.shouldPreProcessed) {
             /* todo I disable this part because right now I dent have any deep link in device.
             if( op1.isDevice){
               // do device processing

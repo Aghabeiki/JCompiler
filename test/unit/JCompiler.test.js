@@ -5,7 +5,7 @@
 'use strict';
 
 const should = require('should');
-const JCompiler = require('../../index');
+const {JCompiler} = require('../../index');
 const fs = require('fs');
 const path = require('path');
 const sampleInput = JSON.parse(fs.readFileSync(

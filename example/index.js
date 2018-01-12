@@ -1,18 +1,25 @@
 const dataModel = require('./dataModelsLoader');
-const JCompiler = require('../index');
+const {JCompiler} = require('../index');
 
-let jCompiler = null;
+let jCompiler = null
 
 try {
   jCompiler = new JCompiler({
 
-      device: {
-        current_location_city_name: {
-          eql: {
-            target: 'destination_airport_city_name'
-          }
+      flight: {
+        average_flight_per_month_exclude_to_month_ago: {
+          greaterThan: 5
         }
       }
+
+      /**
+       * @tutorial booking count in a month more then 1
+       * booking: {
+       * average_flight_per_month: {
+       *    greaterThan: 1
+       *  }
+       * }
+       */
     /**
      * @tutorial deepVerb normal rule.
      *

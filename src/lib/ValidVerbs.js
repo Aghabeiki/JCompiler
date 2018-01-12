@@ -92,7 +92,7 @@ const verbList = [
   {
     'date_of_birth': {
       maps: ['devices', 'date_of_birth'],
-      acceptableOperand: ['today'],
+      acceptableOperand: ['today', 'equalExactDate'],
       fieldName: 'date_of_birth',
     },
   },
@@ -135,12 +135,12 @@ const verbList = [
   },
   {
     'is_member': {
-      maps: ['devices', 'gender'],
+      maps: ['devices', 'is_member'],
       acceptableOperand: ['eql'],
       fieldName: 'gender',
       valuePreProcessor: v => {
         const newVal = {};
-        const manWords = ['true', 'active'];
+        const manWords = ['yes', 'true'];
 
         Object.keys(v).
           forEach(key => {
@@ -250,14 +250,14 @@ const verbList = [
   {
     'std': {
       maps: ['flights', 'std'],
-      acceptableOperand: ['next', 'last', 'today'],
+      acceptableOperand: ['next', 'last', 'today', 'equalExactDate'],
       fieldName: 'std',
     },
   },
   {
     'sta': {
       maps: ['flights', 'sta'],
-      acceptableOperand: ['next', 'last', 'today'],
+      acceptableOperand: ['next', 'last', 'today', 'equalExactDate'],
       fieldName: 'sta',
     },
   },
@@ -318,6 +318,13 @@ const verbList = [
       fieldName: 'appengine_city_under_device',
     },
   },
+  {
+    'average_flight_per_month_exclude_to_month_ago': {
+      maps: ['T_flights', 'F_STD', 'C_count', 'C_last_2_M', 'POST_avrage_per_month'],
+      acceptableOperand: ['eql', 'greaterThan', 'lessThan'],
+      fieldName: 'average_flight_per_month',
+    },
+  },
 
   /* ,
   {"checkin_status": ""}, todo -> ask nazar
@@ -360,6 +367,9 @@ return res;
     },
     get shouldPreProcessed() {
       return this.maps.length >2;
+    },
+    get calcRequired() {
+      return this.maps.filter(item=>item.startsWith('C_')).length>0;
     },
     valuePreProcessor: v[key].valuePreProcessor || function(value) {
       return value;
