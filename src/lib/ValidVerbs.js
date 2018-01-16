@@ -24,53 +24,53 @@
  *      {@link Operands.exList exList}                       - top key: device
  * @property {currency}                                      - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.inList inList},
- *      {@link Operands.inList inList}                       - top Key:  device
+ *      {@link Operands.exList exList}                       - top Key:  device
  * @property {hometown}                                      - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.inList inList},
- *      {@link Operands.inList inList}                       - top Key:  device
+ *      {@link Operands.exList exList}                       - top Key:  device
  * @property {country}                                       - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.inList inList},
- *      {@link Operands.inList inList}                       - top Key:  device
+ *      {@link Operands.exList exList}                       - top Key:  device
  * @property {is_member}                                     - allowed operands   {@link Operands.eql eql}
  *                                                           - top Key:  device
  * @property {flight_stats_notification}                     - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.inList inList},
- *      {@link Operands.inList inList}                       - top Key: device
+ *      {@link Operands.exList exList}                       - top Key: device
  * @property {campaign_notification}                         - allowed operands   {@link Operands.eql eql}
  *                                                           - top Key: device
  * @property {app_version}                                   - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.inList inList},
- *      {@link Operands.inList inList},
+ *      {@link Operands.exList exList},
  *      {@link Operands.like like}                           - top Key:  device
  * @property {device_type}                                   - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.inList inList},
- *      {@link Operands.inList inList},
+ *      {@link Operands.exList exList},
  *      {@link Operands.like like}                           - top Key:  device
  * @property {device_os_version}                             - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.inList inList},
- *      {@link Operands.inList inList},
+ *      {@link Operands.exList exList},
  *      {@link Operands.like like}                           -  top Key:  device
  * @property {device_locale}                                 - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.inList inList},
- *      {@link Operands.inList inList}                       - top Key:  device
+ *      {@link Operands.exList exList}                       - top Key:  device
  * @property {pnr}                                           - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.inList inList},
- *      {@link Operands.inList inList},
+ *      {@link Operands.exList exList},
  *      {@link Operands.like like}                           - top Key:  booking
  * @property {flight_number}                                 - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.inList inList},
- *      {@link Operands.inList inList},
+ *      {@link Operands.exList exList},
  *      {@link Operands.like like}                           - top Key:  flight
  * @property {origin_airport}                                - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.inList inList},
- *      {@link Operands.inList inList},
+ *      {@link Operands.exList exList},
  *      {@link Operands.like like}                           - top Key:  flight
  * @property {destination_airport_IATA_CODE}                 - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.inList inList},
- *      {@link Operands.inList inList}                       - top Key:  flight
+ *      {@link Operands.exList exList}                       - top Key:  flight
  * @property {destination_airport_city_name}                 - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.inList inList},
- *      {@link Operands.inList inList}                       - top Key:  flight
+ *      {@link Operands.exList exList}                       - top Key:  flight
  * @property {std}                                           - allowed operands   {@link Operands.next next},
  *      {@link Operands.last last},
  *      {@link Operands.today today},
@@ -83,20 +83,23 @@
  *      {@link Operands.lessThan lessThan},
  *      {@link Operands.greaterThan greaterThan},
  *      {@link Operands.inList inList},
+ *      {@link Operands.exList exList},
  *      {@link Operands.between between}                     - top Key:  booking
  * @property {child_count}                                   - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.lessThan lessThan},
  *      {@link Operands.greaterThan greaterThan},
  *      {@link Operands.inList inList},
+ *      {@link Operands.exList exList},
  *      {@link Operands.between between}                     - top Key:  booking
  * @property {infant_count}                                  - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.lessThan lessThan},
  *      {@link Operands.greaterThan greaterThan},
  *      {@link Operands.inList inList},
+ *      {@link Operands.exList exList},
  *      {@link Operands.between between}                     - top key:  booking
  * @property {payment_status}                                - allowed operands   {@link Operands.eql eql},
  *      {@link Operands.inList inList},
- *      {@link Operands.inList inList}                       - top Key: booking
+ *      {@link Operands.exList exList},                      - top Key: booking
  * @property {payment_hold_datetime}                         - allowed operands   {@link Operands.next next},
  *      {@link Operands.next next},
  *      {@link Operands.today today},
