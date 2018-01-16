@@ -378,6 +378,18 @@ class Commons {
                   andRes = andRes && param !== rule['!'];
                 }
                 break;
+              case 'like':
+                try {
+                  andRes = andRes && new RegExp('^'+rule['like'].replace(/%/g,'(.*)').
+                    replace(/_/g,'(.)').
+                    replace(/\[/g,'').
+                    replace(/]/g,'')+'$').test(param);
+                }
+                catch (err){
+                  andRes=false;
+                }
+
+                break;
             }
           });
         res = res || andRes;
@@ -525,10 +537,9 @@ class Commons {
 
   /**
    * @desc Returns an array with arrays of the given size.
-   *
    * @param {Array} myArray  Array to split
-   * @param {Integer} chunkSize  Size of every group
-   * @return {[Array]}
+   * @param {Number} chunkSize  Size of every group
+   * @return {Array}
    */
    chunkArray(myArray, chunkSize) {
     const results = [];

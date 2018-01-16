@@ -160,7 +160,7 @@ module.exports = [
   },
   {
     push_token: 'test4',
-    email_address: 'amin.aghabeiki@gmail.com',
+    email_address: 'amin.aghabeiki@test.com',
     mobile_number: 127623452,
     firstname: 'amin3',
     lastname: 'aghabeiki',
@@ -182,7 +182,7 @@ module.exports = [
       {
         pnr: 'ABC1',
         airline_iata_code: 'DD',
-        flight_number: '1234',
+        flight_number: '2355',
         origin: 'KUL',
         destination: 'IKA',
         STD: new Date('2017/1/1').toISOString(),
@@ -351,7 +351,7 @@ module.exports = [
     lastname: 'aghabeiki',
     gender: 1,
     date_of_birth: new Date('1987/3/21').toISOString(),
-    passport_expiry: new Date('2017/08/25').toISOString(),
+    passport_expiry: new Date('2018-01-16').toISOString(),
     language: 'EN',
     currency: 'RM',
     city: 'mamad abad',

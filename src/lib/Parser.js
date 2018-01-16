@@ -125,14 +125,7 @@ class Parser {
    *
    * @param {json} rules
    * @param {function} filter
-   * @return {{
-      general: Object,
-      dateTime: Object,
-      inDeep: Object,
-      deepLink: Array,
-      extraTables: Array,
-
-    }}
+   * @return {{general: Object,dateTime: Object,inDeep: Object,deepLink: Array,extraTables: Array}}
    */
   loadConditions(rules, filter) {
     const generalAndDeep = Handler.loadConditionsImplement(rules, filter, false);

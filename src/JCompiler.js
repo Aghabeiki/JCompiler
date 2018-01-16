@@ -95,7 +95,7 @@ class JCompiler {
   }
 
   /**
-   * @descn content setter
+   * @desc content setter
    * @param {json} value
    */
   set content(value) {
@@ -316,8 +316,8 @@ class JCompiler {
                   const months=momentJS(last).diff(momentJS(first), 'months', true)+1;
 
                   if (months) {
-res=res/months;
-}
+                    res=res/months;
+                  }
                 }
               }
 

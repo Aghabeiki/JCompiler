@@ -3,70 +3,138 @@
 /**
  * @namespace  verbList
  * @desc <p> the valid verbs</p<br>
- * @property email_address
- * @property mobile_number
- * @property firstname
- * @property lastname
- * @property gender
- * @property date_of_birth
- * @property passport_expiry
- * @property language
- * @property currency
- * @property city
- * @property country
- * @property is_member
- * @property flight_stats_notification
- * @property campaign_notification
- * @property app_version
- * @property device_type
- * @property device_os_version
- * @property device_locale
- * @property pnr
- * @property flight_number
- * @property origin_airport
- * @property destination_airport
- * @property std
- * @property sta
- * @property passenger_count
- * @property has_children
- * @property has_infant
- * @property payment_status
- * @property payment_hold_datetime
- * @property live_location_city_name
- * @property checkin_status
- * @property geofence
- * @property latitude
- * @property longitude
- * @property radius
- * @const
+ * @property {email_address}                                 - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.like like}                           - top Key: device
+ * @property {mobile_number}                                 - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.like like}                           - top Key: device
+ * @property {firstname}                                     - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.like like}                           - top Key: device
+ * @property {lastname}                                      - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.like like}                           - top Key: device
+ * @property {gender}                                        - allowed operands   {@link Operands.eql eql}
+ *                                                           - top Key: device
+ * @property {date_of_birth}                                 - allowed operands   {@link Operands.today today},
+ *      {@link Operands.equalExactDate equalExactDate}       - top Key: device
+ * @property {passport_expiry}                               - allowed operands   {@link Operands.next next},
+ *      {@link Operands.next next},
+ *      {@link Operands.today today},
+ *      {@link Operands.equalExactDate equalExactDate}       - top Key:  device
+ * @property {language}                                      - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.exList exList}                       - top key: device
+ * @property {currency}                                      - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.inList inList}                       - top Key:  device
+ * @property {hometown}                                      - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.inList inList}                       - top Key:  device
+ * @property {country}                                       - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.inList inList}                       - top Key:  device
+ * @property {is_member}                                     - allowed operands   {@link Operands.eql eql}
+ *                                                           - top Key:  device
+ * @property {flight_stats_notification}                     - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.inList inList}                       - top Key: device
+ * @property {campaign_notification}                         - allowed operands   {@link Operands.eql eql}
+ *                                                           - top Key: device
+ * @property {app_version}                                   - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.like like}                           - top Key:  device
+ * @property {device_type}                                   - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.like like}                           - top Key:  device
+ * @property {device_os_version}                             - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.like like}                           -  top Key:  device
+ * @property {device_locale}                                 - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.inList inList}                       - top Key:  device
+ * @property {pnr}                                           - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.like like}                           - top Key:  booking
+ * @property {flight_number}                                 - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.like like}                           - top Key:  flight
+ * @property {origin_airport}                                - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.like like}                           - top Key:  flight
+ * @property {destination_airport_IATA_CODE}                 - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.inList inList}                       - top Key:  flight
+ * @property {destination_airport_city_name}                 - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.inList inList}                       - top Key:  flight
+ * @property {std}                                           - allowed operands   {@link Operands.next next},
+ *      {@link Operands.last last},
+ *      {@link Operands.today today},
+ *      {@link Operands.equalExactDate equalExactDate}       - top Key:  flight
+ * @property {sta}                                           - allowed operands   {@link Operands.next next},
+ *      {@link Operands.next next},
+ *      {@link Operands.today today},
+ *      {@link Operands.equalExactDate equalExactDate}       - top Key:  flight
+ * @property {passenger_count}                               - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.lessThan lessThan},
+ *      {@link Operands.greaterThan greaterThan},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.between between}                     - top Key:  booking
+ * @property {child_count}                                   - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.lessThan lessThan},
+ *      {@link Operands.greaterThan greaterThan},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.between between}                     - top Key:  booking
+ * @property {infant_count}                                  - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.lessThan lessThan},
+ *      {@link Operands.greaterThan greaterThan},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.between between}                     - top key:  booking
+ * @property {payment_status}                                - allowed operands   {@link Operands.eql eql},
+ *      {@link Operands.inList inList},
+ *      {@link Operands.inList inList}                       - top Key: booking
+ * @property {payment_hold_datetime}                         - allowed operands   {@link Operands.next next},
+ *      {@link Operands.next next},
+ *      {@link Operands.today today},
+ *      {@link Operands.equalExactDate equalExactDate}       - top key:  booking
+ * @property {current_location_city_name}                    - allowed operands   {@link Operands.eql eql}
+ *                                                           - top key:  device
+ * @property {average_flight_per_month_exclude_to_month_ago} - allowed operands   {@link Operands.eql eql},
+ * {@link Operands.greaterThan greaterThan},
+ * {@link Operands.lessThan lessThan}                        - top Key:  flight
+
  */
 
 const verbList = [
   {
     'email_address': {
       maps: ['devices', 'email_address'],
-      acceptableOperand: ['eql'],
+      acceptableOperand: ['eql','like'],
       fieldName: 'email_address',
     },
   },
   {
     'mobile_number': {
       maps: ['devices', 'mobile_number'],
-      acceptableOperand: ['eql'],
+      acceptableOperand: ['eql','like'],
       fieldName: 'mobile_number',
     },
   },
   {
     'firstname': {
       maps: ['devices', 'firstname'],
-      acceptableOperand: ['eql'],
+      acceptableOperand: ['eql','like'],
       fieldName: 'firstname',
     },
   },
   {
     'lastname': {
       maps: ['devices', 'lastname'],
-      acceptableOperand: ['eql'],
+      acceptableOperand: ['eql','like'],
       fieldName: 'lastname',
     },
   },
@@ -154,9 +222,21 @@ const verbList = [
   },
   {
     'flight_stats_notification': {
-      maps: ['devices', 'country'],
+      maps: ['devices', 'flight_stats_notification'],
       acceptableOperand: ['eql', 'inList', 'exList'],
-      fieldName: 'country',
+      fieldName: 'flight_stats_notification',
+      valuePreProcessor: v => {
+        const newVal = {};
+        const manWords = ['true', 'active'];
+
+        Object.keys(v).
+          forEach(key => {
+            newVal[key] = manWords.map(menWord => menWord.toLowerCase()).
+              indexOf(v[key]) !== -1 ? 1 : 0;
+          });
+
+        return newVal;
+      },
     },
   },
   {
@@ -181,7 +261,7 @@ const verbList = [
   {
     'app_version': {
       maps: ['devices', 'app_version'],
-      acceptableOperand: ['eql', 'inList', 'exList'],
+      acceptableOperand: ['eql', 'inList', 'exList','like'],
       fieldName: 'app_version',
     },
   },
@@ -189,14 +269,14 @@ const verbList = [
     'device_type': {
 
       maps: ['devices', 'device_type'],
-      acceptableOperand: ['eql', 'inList', 'exList'],
+      acceptableOperand: ['eql', 'inList', 'exList','like'],
       fieldName: 'device_type',
     },
   },
   {
     'device_os_version': {
       maps: ['devices', 'device_os_version'],
-      acceptableOperand: ['eql', 'inList', 'exList'],
+      acceptableOperand: ['eql', 'inList', 'exList','like'],
       fieldName: 'device_os_version',
     },
   },
@@ -211,14 +291,14 @@ const verbList = [
   {
     'pnr': {
       maps: ['bookings', 'pnr'],
-      acceptableOperand: ['eql', 'inList', 'exList'],
+      acceptableOperand: ['eql', 'inList', 'exList','like'],
       fieldName: 'pnr',
     },
   },
   {
     'flight_number': {
       maps: ['flights', 'flight_number'],
-      acceptableOperand: ['eql', 'inList', 'exList'],
+      acceptableOperand: ['eql', 'inList', 'exList','like'],
       fieldName: 'flight_number',
     },
   },
@@ -226,7 +306,7 @@ const verbList = [
     'origin_airport': {
 
       maps: ['flights', 'origin'],
-      acceptableOperand: ['eql', 'inList', 'exList'],
+      acceptableOperand: ['eql', 'inList', 'exList','like'],
       fieldName: 'origin_airport',
     },
   },
@@ -307,7 +387,7 @@ const verbList = [
   {
     'payment_hold_datetime': {
       maps: ['bookings', 'hold_datetime'],
-      acceptableOperand: ['next', 'last', 'today'],
+      acceptableOperand: ['next', 'last', 'today','equalExactDate'],
       fieldName: 'std',
     },
   },
@@ -363,7 +443,7 @@ const verbList = [
           break;
       }
 
-return res;
+      return res;
     },
     get shouldPreProcessed() {
       return this.maps.length >2;
