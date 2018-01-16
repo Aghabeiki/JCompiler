@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JCompiler.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Commons.html">Commons</a><ul class='methods'><li data-type='method'><a href="Commons.html#chunkArray">chunkArray</a></li><li data-type='method'><a href="Commons.html#filedNameMachs">filedNameMachs</a></li><li data-type='method'><a href="Commons.html#getVerbConfig">getVerbConfig</a></li><li data-type='method'><a href="Commons.html#getVerbsInString">getVerbsInString</a></li><li data-type='method'><a href="Commons.html#isEmpty">isEmpty</a></li><li data-type='method'><a href="Commons.html#isLanguageISO">isLanguageISO</a></li><li data-type='method'><a href="Commons.html#isValidDate">isValidDate</a></li><li data-type='method'><a href="Commons.html#isValidVerb">isValidVerb</a></li><li data-type='method'><a href="Commons.html#logicalConfirmDeepMap">logicalConfirmDeepMap</a></li><li data-type='method'><a href="Commons.html#paramValidator">paramValidator</a></li><li data-type='method'><a href="Commons.html#replaceAll">replaceAll</a></li><li data-type='method'><a href="Commons.html#ruleDateValidator">ruleDateValidator</a></li><li data-type='method'><a href="Commons.html#ruleGeneralValidator">ruleGeneralValidator</a></li><li data-type='method'><a href="Commons.html#ruleInDeepValidator">ruleInDeepValidator</a></li><li data-type='method'><a href="Commons.html#topKeyValidator">topKeyValidator</a></li><li data-type='method'><a href="Commons.html#validRules">validRules</a></li></ul></li><li><a href="JCompiler.html">JCompiler</a><ul class='methods'><li data-type='method'><a href="JCompiler.html#loadPNS">loadPNS</a></li></ul></li><li><a href="Parser.html">Parser</a><ul class='methods'><li data-type='method'><a href="Parser.html#extractValue">extractValue</a></li><li data-type='method'><a href="Parser.html#loadConditions">loadConditions</a></li><li data-type='method'><a href="Parser.html#loadConditionsImplement">loadConditionsImplement</a></li><li data-type='method'><a href="Parser.html#loadPreProcessVerbs">loadPreProcessVerbs</a></li><li data-type='method'><a href="Parser.html#rawContentParser">rawContentParser</a></li><li data-type='method'><a href="Parser.html#rawTargetParser">rawTargetParser</a></li></ul></li><li><a href="ResultCalculator.html">ResultCalculator</a><ul class='methods'><li data-type='method'><a href="ResultCalculator.html#collectConditionResults">collectConditionResults</a></li></ul></li></ul><h3>Namespaces</h3><ul><li><a href="Operands.html">Operands</a></li><li><a href="verbList.html">verbList</a></li></ul><h3>Global</h3><ul><li><a href="global.html#selectOperands">selectOperands</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">JCompiler.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+const _target = new WeakMap();
+const _content = new WeakMap();
+const momentJS = require('moment');
+const _ = require('lodash');
+const tz = require('countryjs');
+const parser = require('./lib/Parser').
+  getInstance();
+const commons = require('./lib/Commons').
+  getInstance();
+const ResultCalculator=require('./lib/ResultCalculator');
+
+/**
+ *
+ * @param {String} operands
+ * @param {Array} values
+ * @return {{}}
+ */
+const selectOperands = (operands, values) => {
+  let rule = {};
+
+  switch (operands) {
+    case 'eql':
+      if (values.length === 1) {
+        // Simple equal.
+        rule = values[0];
+      }
+      else if (values.length > 1) {
+        // In a list.
+        rule = values;
+      }
+      else {
+        // Not valid at all( null).
+        rule = null;
+      }
+
+      break;
+  }
+
+  return rule;
+};
+
+const generalCompare = (obj, rules) => (commons.validator.ruleGeneralValidator(obj, rules.general) &amp;&amp;
+  commons.validator.ruleDateValidator(obj, rules.dateTime));
+let Handler = null;
+
+/**
+ * The JCompiler Main Object
+ *
+ * @description this object get the target ( search condition)
+ *              and the content ( select rows ) and generate
+ *              the query for waterlines and load data
+ *
+ * @typedef {Object} JSONTargetObject
+ * @typedef {Object} JSONContentObject
+ *
+ *
+ * @param {JSONTargetObject} target - the target search
+ * @param {JSONContentObject} content - the selected column */
+class JCompiler {
+  /**
+   *
+   * @param {json} target
+   * @param {json} content
+   */
+  constructor(target, content) {
+    Handler = this;
+    this.target = parser.rawTargetParser(target);
+    this.content = parser.rawContentParser(content);
+  }
+
+  /**
+   * @desc target getter
+   * @return {JSON}
+   */
+  get target() {
+    return _target.get(Handler);
+  }
+
+  /**
+   * @desc target setter
+   * @param {JSON} value
+   */
+  set target(value) {
+    _target.set(Handler, value);
+  }
+
+  /**
+   * @desc content getter
+   * @return {json}
+   */
+  get content() {
+    return _content.get(Handler);
+  }
+
+  /**
+   * @desc content setter
+   * @param {json} value
+   */
+  set content(value) {
+    _content.set(Handler, value);
+  }
+
+  /**
+   * @param {T} sails
+   * @param {string} prefix
+   * @return {Promise}
+   */
+  loadPNS(sails, prefix = '') {
+    const functionBody = 'return sails' + prefix + '.devices';
+
+    let deviceRules = {general: {}};
+    let flightRules = null,
+      bookingRules = null;
+    let flightFilter,
+      bookingFilter,
+      deviceFilter;
+    const emptyRule = () => true;
+    const target = this.target;
+    const topKey = Object.keys(target);
+    const inDeepRules = [];
+    const deepLinkPreprocessor = [];
+    const extraTables = new Set();
+
+    flightFilter = bookingFilter = deviceFilter = emptyRule;
+
+    if (topKey.indexOf('device') !== -1) {
+      // add the device data models to function body
+      deviceRules = parser.loadConditions(target['device'],
+        new Function('rules', 'return rules.config.isDevice'));
+      if (Object.keys(deviceRules.inDeep).length) {
+        inDeepRules.push(...deviceRules.inDeep);
+      }
+      if (deviceRules.extraTables.length) {
+        deviceRules.extraTables.forEach(item => extraTables.add(item));
+      }
+      if (Object.keys(deviceRules.deepLink).length) {
+        deepLinkPreprocessor.push(...deviceRules.deepLink);
+      }
+    }
+    if (topKey.indexOf('flight') !== -1) {
+      flightRules = parser.loadConditions(target['flight'],
+        new Function('rules', 'return rules.config.isFlight'));
+      if (Object.keys(flightRules.inDeep).length) {
+        inDeepRules.push(...flightRules.inDeep);
+      }
+      if (flightRules.extraTables.length) {
+        flightRules.extraTables.forEach(item => extraTables.add(item));
+      }
+      if (Object.keys(flightRules.deepLink).length) {
+        deepLinkPreprocessor.push(...flightRules.deepLink);
+      }
+    }
+    if (topKey.indexOf('booking') !== -1) {
+      bookingRules = parser.loadConditions(target['booking'],
+        new Function('rules', 'return rules.config.isBooking'));
+      if (Object.keys(bookingRules.inDeep).length) {
+        inDeepRules.push(...bookingRules.inDeep);
+      }
+      if (bookingRules.extraTables.length) {
+        bookingRules.extraTables.forEach(item => extraTables.add(item));
+      }
+      if (Object.keys(bookingRules.deepLink).length) {
+        deepLinkPreprocessor.push(...bookingRules.deepLink);
+      }
+    }
+    const that = this;
+    const orchestra = async () => {
+      let res = [];
+
+      try {
+        const normalVerbs = Array.from(extraTables);
+        const extraInfo = (await Promise.all(normalVerbs.map(
+          tableName => new Function('sails', `return sails${prefix}.${tableName.toLowerCase()}`).call(that, sails).
+            find()
+        ))).reduce((p, v, index) => {
+          p[normalVerbs[index]] = v;
+
+          return p;
+        }, {});
+
+        // update the rules.
+
+        deviceFilter = obj => commons.validator.ruleDateValidator(obj, deviceRules.dateTime || {});
+
+        if (flightRules) {
+          flightFilter = obj => generalCompare(obj, flightRules);
+        }
+        if (bookingRules) {
+          bookingFilter = obj => generalCompare(obj, bookingRules);
+        }
+
+        const devices = await (new Function('sails', functionBody).call(that,
+          sails).
+          find({where: deviceRules.general}).
+          populate(['anyFlights', 'anyBooking']));
+        let PNSs = devices.filter(device => {
+          let out;
+
+          if (!deviceFilter(device)) {
+            out = false;
+          }
+          else {
+            out = true;
+            if (flightFilter !== emptyRule) {
+              out = out &amp;&amp; device.anyFlights.filter(flightFilter).length !== 0;
+            }
+            if (bookingFilter !== emptyRule) {
+              out = out &amp;&amp; device.anyBooking.filter(bookingFilter).length !== 0;
+            }
+          }
+
+          return out;
+        });
+
+        deepLinkPreprocessor.forEach(rules => {
+          // check op1 &amp; op2
+          const op1 = rules.config;
+          const op2 = Object.keys(rules.value).
+            filter((undefined, index) => index === 0).
+            // Skip all operands expect first one.
+            reduce((p, v) => {
+              if (_.isObject(rules.value[v]) &amp;&amp; typeof rules.value[v].target === 'string') {
+                p = commons.commons.getVerbConfig(rules.value[v].target);
+              }
+              else {
+                p = rules.value[v];
+              }
+
+              return p;
+            }, {});
+          const operand = Object.keys(rules.value)[0]; // Skip all operands expect first one.
+          // Resolve the OPs
+          let OP2Value = null;
+
+          if (op2.target &amp;&amp; (op2.target.hasOwnProperty('shouldPreProcessed') &amp;&amp;
+              typeof op2.target.shouldPreProcessed === 'boolean' &amp;&amp; op2.target.shouldPreProcessed)) {
+            // do something
+
+            const [table, filed, ...join] = op2.target.maps;
+
+            OP2Value = {
+              targetTable: table.replace('T_', ''),
+              targetFiled: filed.replace('F_', ''),
+              map: {},
+            };
+            commons.commons.chunkArray(join, 3).
+              forEach((parts, index) => {
+                const [destinationField, table, field] = parts;
+
+                extraInfo[table.replace('T_', '')].forEach(row => {
+                  if (!index) {
+                    OP2Value.map[row[destinationField.replace('F_', '')]] = row[field.replace('F_', '')];
+                  }
+                  else {
+                    const objectKeys = Object.keys(OP2Value.map);
+
+                    for (let i = 0; i &lt; objectKeys.length; i++) {
+                      if (OP2Value.map[objectKeys[i]] === row[destinationField.replace('F_', '')]) {
+                        OP2Value.map[objectKeys[i]] = row[field.replace('F_', '')];
+                      }
+                    }
+                  }
+                });
+              });
+          }
+          else {
+            OP2Value = op2;
+          }
+
+          if (op1.calcRequired) {
+            //
+            const calcParam=(guideMap, pns)=>{
+              const postProcess=guideMap.filter(item=>item.startsWith('POST_'));
+              const [table, filed, resultsMode, ...otherCondition]=guideMap.
+                filter(item=>!item.startsWith('POST_')).
+                map(item=>item.replace('T_', '').replace('F_', '').replace('C_', ''));
+              const baseTable=table==='bookings'?pns.anyBooking : table==='flights'? pns.anyFlights :[];
+              const filedData=baseTable.map(item=>item[filed]);
+              const resultCalculator=new ResultCalculator(resultsMode);
+
+              filedData.forEach(value=>{
+                let res=false;
+
+                if (!otherCondition.length) {
+                  res=true;
+                }
+                else {
+                // It's messy code , if u need fix it.
+                  const [cmd, ...params]=otherCondition[0].replace('C_', '').split('_');
+
+                  if (cmd==='last') {
+                    res=(momentJS().add(params[0], params[1]).isAfter(momentJS(value)));
+                  }
+                }
+
+                resultCalculator.collectConditionResults(res, value);
+              });
+              let res=resultCalculator.Results;
+
+              if (postProcess.length) {
+                // just accept first post process;
+                /**
+                 * messy code is here !
+                 * its just hard coded unfortunately.
+                 *
+                 */
+                if (postProcess[0]==='POST_avrage_per_month') {
+                  // get first date,
+                  // get last date
+                  // calc how many month available.
+                  // calculate the avrage.
+                  const first=_.min(filedData.map(item=>new Date(item)));
+                  const last=_.max(filedData.map(item=>new Date(item)));
+                  const months=momentJS(last).diff(momentJS(first), 'months', true)+1;
+
+                  if (months) {
+                    res=res/months;
+                  }
+                }
+              }
+
+              return res;
+            };
+
+            PNSs=PNSs.filter(pns=>{
+              let res=false;
+              const calculatedOp1Value=calcParam(op1.maps, pns);
+
+              switch (operand) {
+                case 'eql':
+                  res= calculatedOp1Value == OP2Value;
+                  break;
+                case 'greaterThan':
+                  res= calculatedOp1Value >= OP2Value;
+                  break;
+                case 'lessThan':
+                  res = calculatedOp1Value &lt;= OP2Value;
+                  break;
+              }
+
+              return res;
+            });
+          }
+          else if (op1.shouldPreProcessed) {
+            /* todo I disable this part because right now I dent have any deep link in device.
+            if( op1.isDevice){
+              // do device processing
+            }*/
+
+            /* Two first is table and base filed from the baseSelector and the rest
+               is join table , each join have 3 part , so split the join tables to 3 base chunks.
+             */
+            let secondParts = selectOperands(operand, OP2Value);
+            const [targetTable, baseFiled, ...joinedTables] = rules.config.maps;
+
+            commons.commons.chunkArray(joinedTables, 3).
+              reverse().
+              reduce((p, v) => {
+                const [destinationField, table, searchField] = v.
+                  map(item => item.replace('T_', '').
+                    replace('F_', ''));
+
+                if (extraInfo[table]) {
+                  const filtering = part => {
+                    let res = false;
+
+                    if (typeof secondParts === 'string' ||
+                      typeof secondParts === 'number' ||
+                      typeof secondParts === 'boolean') {
+                      res = part[searchField] == secondParts; // eslint-disable-line eqeqeq
+                    }
+                    else {
+                      res = false;
+                    }
+
+                    return res;
+                  };
+
+                  secondParts = extraInfo[table].
+                    filter(filtering).
+                    // Run the rules.
+                    reduce((p, v, index, array) => { // Format the results.
+                      p.push(v[destinationField]);
+                      if (array.length === index + 1) {// Collapse the results.
+                        p = Array.from(new Set(p));
+                        if (p.length === 1) {
+                          p = p[0];
+                        }
+                      }
+
+                      return p;
+                    }, []);
+                }
+              }, []);
+
+            // Filter PNS based the new rules and update it.
+
+            const myCompare = (val1, val2) => {
+              let res = false;
+              const typeOfVal2 = typeof val2;
+
+              if (Array.isArray(val2)) {
+                res = val2.indexOf(val1) !== -1;
+              }
+              else if (['string', 'number', 'boolean'].indexOf(typeOfVal2) !== -1) {
+                res = val1 == val2;// eslint-disable-line eqeqeq
+              }
+
+              return res;
+            };
+
+            PNSs = PNSs.filter(pns => {
+              let baseSelector = pns;
+              let byPassed = false;
+
+              switch (targetTable.replace('T_', '')) {
+                case 'flights':
+                  baseSelector = baseSelector.anyFlights;
+                  break;
+                case 'bookings':
+                  baseSelector = baseSelector.anyBooking;
+              }
+              for (let i = 0; i &lt; baseSelector.length &amp;&amp; !byPassed; i++) {
+                byPassed = myCompare(baseSelector[i][baseFiled.replace('F_', '')], secondParts);
+              }
+
+              return byPassed;
+            });
+          }// End of OP1 deep processing.
+          else { // OP2 processing
+            const filter = (pns => {
+              const currentOp1Value = parser.extractValue(op1.maps[0], op1.maps[1], pns);
+              const currentOp2Value = parser.extractValue(OP2Value.targetTable, OP2Value.targetFiled, pns);
+
+              return commons.validator.logicalConfirmDeepMap(currentOp1Value, currentOp2Value, operand, OP2Value.map);
+            });
+
+            PNSs = PNSs.filter(filter);
+          }
+        });// End of deep link processing.
+
+        inDeepRules.forEach(rule => {
+          PNSs = PNSs.filter(pns => {
+            const currentOP1Value = parser.extractValue(rule.maps[0], rule.maps[1], pns);
+            const operand = Object.keys(rule.rules)[0];
+            const currentOP2Value = parser.extractValue(rule.rules[operand][0], rule.rules[operand][1], pns);
+
+            return commons.validator.logicalConfirmDeepMap(currentOP1Value, currentOP2Value, operand);
+          });
+        });
+        res = PNSs.map(PNS => {
+          const tmp = {};
+
+          tmp.pnsID = PNS.push_token;
+          tmp.lang = PNS.device_locale || 'en-us';
+          let params;
+
+          if (PNS.device_locale !== undefined &amp;&amp; PNS.device_locale !== null &amp;&amp;
+            Handler.content[PNS.device_locale.toLowerCase()] !==
+            undefined) {
+            params = Handler.content[PNS.device_locale.toLowerCase()];
+          }
+          else if (Handler.content['en-us'] !== undefined) {
+            params = Handler.content['en-us'];
+          }
+          else {
+            params = Handler.content[Object.keys(Handler.content)[0]];
+          }
+          tmp.params = {};
+          Object.keys(params).
+            map(key => params[key]).
+            reduce((p, v) => {
+              v.forEach(param => {
+                if (p.filter(key => key.name === param.name).length !== 1) {
+                  p.push(param);
+                }
+              });
+
+              return p;
+            }, []).
+            forEach(param => {
+              let val = '';
+
+              switch (param.target.maps[0]) {
+                case 'devices':
+                  val = PNS[param.target.maps[1]];
+                  try {
+                    if (val !== undefined &amp;&amp; val !== null &amp;&amp; commons.validator.isValidDate(val)) {
+                      tz.timezones(PNS.country);
+
+                      if (PNS.latitude !== null &amp;&amp; PNS.latitude !== undefined) {
+                        const tzwhere = require('tzwhere');
+
+                        tzwhere.init();
+                        const min = tzwhere.tzOffsetAt(PNS.latitude,
+                          PNS.longitude) / 60000;
+
+                        val = momentJS(val).
+                          utcOffset(min).
+                          format('DD-MMM-YYYY hh:mm A');
+                      }
+                      else if (tz !== undefined &amp;&amp; tz !== null &amp;&amp;
+                        tz.length >= 0) {
+                        val = momentJS(val).
+                          utcOffset(tz[0].replace('UTC', '')).
+                          format('DD-MMM-YYYY hh:mm A');
+                      }
+                      else {
+                        val = momentJS(val).
+                            format('DD-MMM-YYYY hh:mm A') +
+                          ' (in UTC timezone) ';
+                      }
+                    }
+                  }
+                  catch (err) {
+                    console.log(err);// eslint-disable-line no-console
+                  }
+                  break;
+                case 'flights':
+                  val = PNS.anyFlights.reduce((p, v, i, arr) => p + (i != 0 ? ',' : '') + v[param.target.maps[1]],
+                    '');
+                  break;
+                case 'bookings':
+                  val = PNS.anyBooking.reduce((p, v, i, arr) => p + (i != 0 ? ',' : '') + v[param.target.maps[1]],
+                    '');
+                  break;
+                default:
+                  val = 'NotFound';
+                  break;
+              }
+              tmp.params[param.name] = val;
+            });
+
+          return tmp;
+        });
+      }
+      catch (err) {
+        res = err;
+      }
+
+      return res;
+    };
+
+    return new Promise((resolve, reject) => {
+      orchestra().
+        then(res => {
+          if (res instanceof Error) {
+            reject(res);
+          }
+          else {
+            resolve(res);
+          }
+        }).
+        catch(err => {
+          reject(err);
+        });
+    });
+  }
+}
+
+module.exports = JCompiler;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Tue Jan 16 2018 12:28:00 GMT+0800 (+08) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
