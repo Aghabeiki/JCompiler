@@ -1,6 +1,6 @@
 {
   "name": "jerome-compiler",
-  "version": "2.0.2",
+  "version": "2.1.3",
   "main": "index.js",
   "scripts": {
     "test": "nyc --reporter=text mocha  test/**/*.test.js",

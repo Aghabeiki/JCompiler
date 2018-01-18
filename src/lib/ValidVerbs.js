@@ -244,7 +244,7 @@ const verbList = [
   },
   {
     'campaign_notification': {
-      maps: ['devices', 'gender'],
+      maps: ['devices', 'campaign_notification'],
       acceptableOperand: ['eql'],
       fieldName: 'gender',
       valuePreProcessor: v => {
@@ -332,14 +332,14 @@ const verbList = [
   },
   {
     'std': {
-      maps: ['flights', 'std'],
+      maps: ['flights', 'STD'],
       acceptableOperand: ['next', 'last', 'today', 'equalExactDate'],
       fieldName: 'std',
     },
   },
   {
     'sta': {
-      maps: ['flights', 'sta'],
+      maps: ['flights', 'STA'],
       acceptableOperand: ['next', 'last', 'today', 'equalExactDate'],
       fieldName: 'sta',
     },
