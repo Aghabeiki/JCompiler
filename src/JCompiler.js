@@ -519,12 +519,12 @@ class JCompiler {
                   }
                   break;
                 case 'flights':
-                  val = PNS.anyFlights.reduce((p, v, i, arr) => p + (i != 0 ? ',' : '') + v[param.target.maps[1]],
-                    '');
+                  val = PNS.anyFlights.filter(flightFilter).reduce((p, v, i) => p + (i !== 0 ? ',' : '') +
+                    v[param.target.maps[1]], '');
                   break;
                 case 'bookings':
-                  val = PNS.anyBooking.reduce((p, v, i, arr) => p + (i != 0 ? ',' : '') + v[param.target.maps[1]],
-                    '');
+                  val = PNS.anyBooking.filter(bookingFilter).reduce((p, v, i) => p + (i !== 0 ? ',' : '') +
+                    v[param.target.maps[1]], '');
                   break;
                 default:
                   val = 'NotFound';

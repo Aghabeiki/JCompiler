@@ -116,28 +116,28 @@ const verbList = [
   {
     'email_address': {
       maps: ['devices', 'email_address'],
-      acceptableOperand: ['eql','like'],
+      acceptableOperand: ['eql', 'like'],
       fieldName: 'email_address',
     },
   },
   {
     'mobile_number': {
       maps: ['devices', 'mobile_number'],
-      acceptableOperand: ['eql','like'],
+      acceptableOperand: ['eql', 'like'],
       fieldName: 'mobile_number',
     },
   },
   {
     'firstname': {
       maps: ['devices', 'firstname'],
-      acceptableOperand: ['eql','like'],
+      acceptableOperand: ['eql', 'like'],
       fieldName: 'firstname',
     },
   },
   {
     'lastname': {
       maps: ['devices', 'lastname'],
-      acceptableOperand: ['eql','like'],
+      acceptableOperand: ['eql', 'like'],
       fieldName: 'lastname',
     },
   },
@@ -264,7 +264,7 @@ const verbList = [
   {
     'app_version': {
       maps: ['devices', 'app_version'],
-      acceptableOperand: ['eql', 'inList', 'exList','like'],
+      acceptableOperand: ['eql', 'inList', 'exList', 'like'],
       fieldName: 'app_version',
     },
   },
@@ -272,14 +272,14 @@ const verbList = [
     'device_type': {
 
       maps: ['devices', 'device_type'],
-      acceptableOperand: ['eql', 'inList', 'exList','like'],
+      acceptableOperand: ['eql', 'inList', 'exList', 'like'],
       fieldName: 'device_type',
     },
   },
   {
     'device_os_version': {
       maps: ['devices', 'device_os_version'],
-      acceptableOperand: ['eql', 'inList', 'exList','like'],
+      acceptableOperand: ['eql', 'inList', 'exList', 'like'],
       fieldName: 'device_os_version',
     },
   },
@@ -294,14 +294,14 @@ const verbList = [
   {
     'pnr': {
       maps: ['bookings', 'pnr'],
-      acceptableOperand: ['eql', 'inList', 'exList','like'],
+      acceptableOperand: ['eql', 'inList', 'exList', 'like'],
       fieldName: 'pnr',
     },
   },
   {
     'flight_number': {
       maps: ['flights', 'flight_number'],
-      acceptableOperand: ['eql', 'inList', 'exList','like'],
+      acceptableOperand: ['eql', 'inList', 'exList', 'like'],
       fieldName: 'flight_number',
     },
   },
@@ -309,7 +309,7 @@ const verbList = [
     'origin_airport': {
 
       maps: ['flights', 'origin'],
-      acceptableOperand: ['eql', 'inList', 'exList','like'],
+      acceptableOperand: ['eql', 'inList', 'exList', 'like'],
       fieldName: 'origin_airport',
     },
   },
@@ -390,7 +390,7 @@ const verbList = [
   {
     'payment_hold_datetime': {
       maps: ['bookings', 'hold_datetime'],
-      acceptableOperand: ['next', 'last', 'today','equalExactDate'],
+      acceptableOperand: ['next', 'last', 'today', 'equalExactDate'],
       fieldName: 'std',
     },
   },

@@ -380,12 +380,12 @@ class Commons {
                 break;
               case 'like':
                 try {
-                  andRes = andRes && new RegExp('^'+rule['like'].replace(/%/g,'(.*)').
-                    replace(/_/g,'(.)').
-                    replace(/\[/g,'').
-                    replace(/]/g,'')+'$').test(param);
+                  andRes = andRes && new RegExp('^'+rule['like'].replace(/%/g, '(.*)').
+                    replace(/_/g, '(.)').
+                    replace(/\[/g, '').
+                    replace(/]/g, '')+'$').test(param);
                 }
-                catch (err){
+                catch (err) {
                   andRes=false;
                 }
 

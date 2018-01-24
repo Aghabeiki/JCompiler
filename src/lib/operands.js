@@ -4,7 +4,6 @@
  * @desc Acceptable Operands
  */
 
-
 const moment = require('moment');
 
 const operands = {
@@ -16,14 +15,15 @@ const operands = {
    * @memberOf Operands
    * @name like
    */
-  like:{
-    type:'string',
-    style: function(filedName,value) {
+  like: {
+    type: 'string',
+    style: function(filedName, value) {
       const tmp={};
-      tmp[filedName]={'like':value};
+
+      tmp[filedName]={'like': value};
 
       return tmp;
-    }
+    },
   },
   /**
    * @desc check two value are eql
@@ -114,7 +114,8 @@ const operands = {
   },
   /**
    * @desc Check Op1 is between OP2
-   * @param {Array} op2 - The first value in Array is lowest part of compareation and the second one is upper part of compareation.
+   * @param {Array} op2 - The first value in Array is lowest part of compareation and the second one is
+   *        upper part of compareation.
    * @example infant_count:{between:[1,2]}
    * @memberOf Operands
    * @name between
@@ -266,8 +267,8 @@ return tmp;
    * yy:boolean=true,mm:boolean=true,dd:boolean=true,h:boolean=true,m:boolean=true,s:boolean=false}
    * } there is some string verbs for calculating OP2.
    * @example "sta":{
-    	 		"next":"24 hours"
-    	 	}
+                "next":"24 hours"
+                }
    * @memberOf Operands
    * @name next
    */
@@ -333,8 +334,8 @@ return tmp;
    * @desc Check OP1 is in last time/date before the calculated OP2 from today.
    * @param {{val:string}} there is some string verbs for calculating OP2.
    * @example "sta":{
-    	 		"last":"24 hours"
-    	 	}
+                "last":"24 hours"
+                }
    * @memberOf Operands
    * @name last
    */
